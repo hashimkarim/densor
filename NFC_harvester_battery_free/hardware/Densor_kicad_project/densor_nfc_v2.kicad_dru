@@ -1,0 +1,12 @@
+(version 1)
+# Original 0.15 mm minimum clearance/track width is retained.
+# Bare-neck region is a layout keepout, not a qualified bend-radius specification.
+# V_MCU follows the existing 0.15 mm routing. PSW retains its 0.20 mm routing.
+# Clearance comes from the unchanged project/zone settings: 0.15 mm routing,
+# 0.30 mm zone clearance. Do not override the larger pour clearance here.
+(rule "TMP119 neck V_MCU and I2C width"
+  (condition "A.Type == 'Track' && A.intersectsArea('TMP119 flex neck') && (A.NetName == '/V_MCU' || A.NetName == '/i2c_sda' || A.NetName == '/i2c_scl')")
+  (constraint track_width (min 0.15mm) (opt 0.15mm)))
+(rule "TMP119 neck switched return width"
+  (condition "A.Type == 'Track' && A.intersectsArea('TMP119 flex neck') && A.NetName == '/PSW'")
+  (constraint track_width (min 0.20mm) (opt 0.20mm)))

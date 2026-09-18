@@ -1,0 +1,444 @@
+{
+  "retrieved_date": "2026-09-18",
+  "board_before_sha256": "12c579782f14aeb50dd8688878cd1b09c4f47f6e8267d142990d9b1bcee9d02e",
+  "board_after_sha256": "7738974b56db000d74abe965e7b85427cde5d4e50e0f2826b40393b3ed333c02",
+  "only_model_expressions_changed": true,
+  "models": [
+    {
+      "references": [
+        "U4"
+      ],
+      "path": "Densor.3dshapes/ST_UFQFPN-20_3x3mm_P0.5mm.step",
+      "sha256": "a041605a19c65d5b64ab4e3e43119fd04980a1a759efc863cad57c0ec653b22b",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D/-/raw/6.0.11/Package_DFN_QFN.3dshapes/ST_UFQFPN-20_3x3mm_P0.5mm.step",
+      "source_kind": "official KiCad package model",
+      "source_container_sha256": null,
+      "source_stream": null,
+      "extraction": null,
+      "expected_dimensions_mm": [
+        3,
+        3,
+        0.6
+      ],
+      "package_check": "ST UFQFPN-20, 3 x 3 x 0.6 mm, 0.5 mm pitch, no exposed pad"
+    },
+    {
+      "references": [
+        "C1",
+        "C2"
+      ],
+      "path": "Densor.3dshapes/CPH3225A--3DModel-STEP-56544.step",
+      "sha256": "22910c511cd61a79aa1ea9aa78c71d677f2020087c1c71e0864ed0461c0bbcba",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        -90,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "source_url": "https://github.com/TUDSSL/densor/blob/7aa87d568ecf9f50d3e38afd571a6753df553919/TEG_harvester_battery_free/hardware/Dental%20Sensor%20V400/Dental%20Sensor%20-%20V400.PcbDoc",
+      "source_kind": "unchanged embedded STEP recovered from original Densor TEG variant",
+      "source_container_sha256": "44a28d7b2379cd3abf69d73abf271bc2cac1624bec281bea15a0a157c19ba283",
+      "source_stream": "Models/0",
+      "extraction": "zlib decompression of the named OLE stream, without modifying STEP bytes",
+      "expected_dimensions_mm": [
+        3.2,
+        2.5,
+        1.0
+      ],
+      "package_check": "Exact filename referenced by baseline; 3.2 x 2.5 mm body. Recovered model height is 1.0 mm; current manufacturer nominal height is 0.9 mm. Original model retained without rescaling; do not treat model height as a measured dimension.",
+      "datasheet_reference": "https://www.sii.co.jp/en/me/datasheets/chip-capacitor/cph3225a/"
+    },
+    {
+      "references": [
+        "U5"
+      ],
+      "path": "Densor.3dshapes/LIS2DW12TR.step",
+      "sha256": "194b115eddcf4c45eaf31802af7b4a1ea15624684061e6f3fe97f7e51d9f90a6",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "source_url": "https://github.com/TUDSSL/densor/blob/7aa87d568ecf9f50d3e38afd571a6753df553919/TEG_harvester_battery_free/hardware/Dental%20Sensor%20V400/Dental%20Sensor%20-%20V400.PcbDoc",
+      "source_kind": "unchanged embedded STEP recovered from original Densor TEG variant",
+      "source_container_sha256": "44a28d7b2379cd3abf69d73abf271bc2cac1624bec281bea15a0a157c19ba283",
+      "source_stream": "Models/2",
+      "extraction": "zlib decompression of the named OLE stream, without modifying STEP bytes",
+      "expected_dimensions_mm": [
+        2,
+        2,
+        0.702
+      ],
+      "package_check": "Exact LIS2DW12TR model; 2 x 2 x 0.7 mm body, 0.002 mm marking relief, 12 contacts at 0.5 mm pitch. Pin-1 dot and contact positions match footprint with identity local transform.",
+      "datasheet_reference": "https://www.st.com/resource/en/datasheet/lis2dw12.pdf"
+    },
+    {
+      "references": [
+        "U1"
+      ],
+      "path": "Densor.3dshapes/ST25DV04K-JFR6D3.step",
+      "sha256": "e9168168ab36dbfa0fb976533b3a5642ddc93845d3e429dcfb9073a3739ff1ae",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        -90,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "expected_dimensions_mm": [
+        3,
+        3,
+        0.6
+      ],
+      "source_url": "https://www.snapeda.com/parts/ST25DV04K-JFR6D3/STMicroelectronics/view-part/",
+      "source_kind": "exact-part STEP supplied by user from listed provider",
+      "archive": "vendor/ST25DV04K-JFR6D3.zip",
+      "archive_sha256": "b99f0cd55bd770c2091d8b94026a05d9f87a8db975c4fb6eaab9c133ca8047ef",
+      "archive_member": "ST25DV04K-JFR6D3.step",
+      "package_check": "Exact part; 12 terminals at 0.5 mm pitch plus 1.4 x 2.55 mm exposed paddle. 0.6 mm model height is datasheet maximum. Pin-1 marker aligns to original pad 1 with -90 degree local X rotation."
+    },
+    {
+      "references": [
+        "U6"
+      ],
+      "path": "Densor.3dshapes/RSV0016A.stp",
+      "sha256": "ba1d9951a3f34bf62b15cbcb8e32ba5e01c5f9d4cec433e2a588912e2a969ad8",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0
+      ],
+      "expected_dimensions_mm": [
+        1.8,
+        2.6,
+        0.55
+      ],
+      "source_url": "https://vendor.ultralibrarian.com/TI/embedded/?gpn=TS3A44159&package=RSV&pin=16",
+      "source_kind": "exact-part STEP supplied by user from listed provider",
+      "archive": "vendor/ul_TS3A44159RSVR.zip",
+      "archive_sha256": "f6a4468561fa5701af8b8df30eac8b2675ef83d49a42ad2f5a5ec5e4b5d36186",
+      "archive_member": "RSV0016A.stp",
+      "package_check": "Exact RSV-16 package, 1.8 x 2.6 x 0.55 mm; 16 terminals, 0.4 mm pitch, elongated pin 1. Model is Z-up: identity local transform replaces the old missing model X rotation."
+    },
+    {
+      "references": [
+        "D3"
+      ],
+      "path": "Densor.3dshapes/VEMD1060X01.stp",
+      "sha256": "107943a2c4ae13645663b16ddee046290d3f92b6725deebb33d5ca689ce3810f",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        0,
+        0,
+        180
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0.035
+      ],
+      "expected_dimensions_mm": [
+        2,
+        1.25,
+        0.85
+      ],
+      "source_url": "https://vendor.ultralibrarian.com/vishay/embedded?q=library/ecad/&vdrSearch=VEMD1060X01&docId=84295",
+      "source_kind": "exact-part STEP supplied by user from listed provider",
+      "archive": "vendor/ul_VEMD1060X01.zip",
+      "archive_sha256": "f1754936b1c4f9845eb10b4b1f54c028ae7e9e96e0335f8b6474cd58097ea004",
+      "archive_member": "80238_0805_package.stp",
+      "package_check": "Manufacturer-linked package model, 2 x 1.25 x 0.85 mm. UL footprint pin 1 is ANODE (left), pin 2 CATHODE (right); existing PCB pin 1 is K (left), pin 2 A (right). Rotate model 180 degrees about Z to preserve original polarity. Z +0.035 mm seats lowest surfaces at the PCB surface."
+    },
+    {
+      "references": [
+        "Y1"
+      ],
+      "path": "Densor.3dshapes/ABS05W.STEP",
+      "sha256": "49ffa314b0273893f9f70d32d7eed1a855463ba6305043b007871a5adb82d139",
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "rotation_degrees": [
+        -90,
+        0,
+        0
+      ],
+      "offset_mm": [
+        0,
+        0,
+        0.02
+      ],
+      "expected_dimensions_mm": [
+        1.6,
+        1,
+        0.5
+      ],
+      "source_url": "https://abracon.com/Support/STEP/patch-antenna/Resonators/ABS05W.STEP.zip",
+      "source_kind": "exact-part STEP supplied by user from listed provider",
+      "archive": "vendor/ABS05W.STEP.zip",
+      "archive_sha256": "d5dad84d828f895ce8a5bce3c71110e14bea545731f531fa38a92e717c190f66",
+      "archive_member": "ABS05W.STEP",
+      "package_check": "Manufacturer ABS05W family STEP; 1.6 x 1.0 x 0.5 mm, two terminals, no electrical polarity. Model Y-up: -90 degree local X rotation and Z +0.020 mm seating offset. Original PCB component rotation remains -90 degrees."
+    },
+    {
+      "references": [
+        "C4",
+        "C14",
+        "C12",
+        "C7",
+        "C13",
+        "C6",
+        "C5"
+      ],
+      "path": "Densor.3dshapes/standard/Capacitor_SMD.3dshapes/C_0603_1608Metric.step",
+      "sha256": "4857b3dc717675bf1fb22edda622ac3b3ae03cf44d81eefaf3fa3ba3a86d84c1",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Capacitor_SMD.3dshapes/C_0603_1608Metric.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "J1"
+      ],
+      "path": "Densor.3dshapes/standard/Connector_PinHeader_1.27mm.3dshapes/PinHeader_2x05_P1.27mm_Vertical.step",
+      "sha256": "b5cabcd3e700ee74a3d8f64c687e718a0bc892653ead74bc00e8d4f534ffa575",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Connector_PinHeader_1.27mm.3dshapes/PinHeader_2x05_P1.27mm_Vertical.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "R3",
+        "R7",
+        "R4",
+        "R2"
+      ],
+      "path": "Densor.3dshapes/standard/Resistor_SMD.3dshapes/R_0603_1608Metric.step",
+      "sha256": "1875571c326d0d9e96f36b4efeb8094068ef7619f0a449c781caf0b49c2e5861",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Resistor_SMD.3dshapes/R_0603_1608Metric.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "D2"
+      ],
+      "path": "Densor.3dshapes/standard/Diode_SMD.3dshapes/D_SOD-323.step",
+      "sha256": "cd8619b2119cd95683a2c5e660ab4f2d4db674f696cd6f9e9756f221171a214d",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Diode_SMD.3dshapes/D_SOD-323.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "U2"
+      ],
+      "path": "Densor.3dshapes/standard/Package_DFN_QFN.3dshapes/QFN-16-1EP_3x3mm_P0.5mm_EP1.7x1.7mm.step",
+      "sha256": "3eb81ffac423a66cdcfead8efe56401da171edaf1f2257049aad7b2d3900f6c8",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Package_DFN_QFN.3dshapes/QFN-16-1EP_3x3mm_P0.5mm_EP1.7x1.7mm.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "D1"
+      ],
+      "path": "Densor.3dshapes/standard/Diode_SMD.3dshapes/D_SOD-323F.step",
+      "sha256": "be5930ed2efe5eca953bd400465c68e8d6fe18bbed65f5a40cb96114f48e8ca0",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Diode_SMD.3dshapes/D_SOD-323F.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    },
+    {
+      "references": [
+        "J3"
+      ],
+      "path": "Densor.3dshapes/standard/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x04_P2.54mm_Vertical.step",
+      "sha256": "a74079b8d06bda78847623b39ee1855ffd1d9a8c1e896b349e4f1dc2056d44d9",
+      "offset_mm": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation_degrees": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "source_kind": "installed official KiCad standard package model, vendored unchanged",
+      "source_url": "https://gitlab.com/kicad/libraries/kicad-packages3D",
+      "source_installed_path": "/usr/share/kicad/3dmodels/Connector_PinHeader_2.54mm.3dshapes/PinHeader_1x04_P2.54mm_Vertical.step",
+      "package_check": "Existing baseline standard package model; changed only file location/STEP reference for portability."
+    }
+  ],
+  "pending_references": [],
+  "not_applicable": {
+    "J2": "Eight exposed PCB flex contact fingers; no mounted connector body",
+    "G***": "PCB graphic/logo"
+  },
+  "rejected_candidates": [
+    {
+      "source": "installed KiCad LGA-12_2x2mm_P0.5mm.step",
+      "reason": "1.025 mm overall height; LIS2DW12 body is 0.7 mm"
+    }
+  ]
+}

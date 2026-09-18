@@ -1,0 +1,38 @@
+{
+  "manufacturer": "Texas Instruments",
+  "part": "TMP119AIYBGR",
+  "source_url": "https://vendor.ultralibrarian.com/TI/embedded/?gpn=TMP119&package=YBG&pin=6",
+  "download_date": "2026-09-18",
+  "archive": "vendor/ul_TMP119AIYBGR.zip",
+  "archive_sha256": "7a4bee1627ed4a78dc62245fd2b701c36b25067cfbe1ad257a12e7445be34c6c",
+  "archive_footprint": "KiCADv6/footprints.pretty/DSBGA6_YBG_TEX.kicad_mod",
+  "imported_footprint": "Densor.pretty/DSBGA6_YBG_TEX.kicad_mod",
+  "land_diameter_mm": 0.2032,
+  "column_pitch_mm": 0.4,
+  "row_pitch_mm": 0.40005,
+  "solder_mask_radial_margin_mm": 0.05,
+  "model": "Densor.3dshapes/DSBGA6_YBG_TEX.step",
+  "model_sha256": "dc1491ec325893ce30fb3505318170993165633f95e3cae65629aa13a3e95907",
+  "model_offset_mm": [
+    0,
+    0,
+    0
+  ],
+  "model_rotation_degrees": [
+    0,
+    0,
+    0
+  ],
+  "model_scale": [
+    1,
+    1,
+    1
+  ],
+  "integration_changes": [
+    "Project-local library and model path",
+    "Hide vendor row/column/value text; move and resize reference",
+    "Explicit 0.05 mm radial solder-mask clearance"
+  ],
+  "assembly_review": "Vendor default 0.2032 mm lands differ from TI datasheet example 0.23 mm; confirm land/stencil/coverlay process with flex assembler before fabrication",
+  "symbol": "Existing project symbol retained; pin names/numbers verified against vendor and datasheet"
+}

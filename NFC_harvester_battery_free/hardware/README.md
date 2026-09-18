@@ -1,5 +1,26 @@
-
 # Densor - Hardware
+
+The TMP119 and its 100 nF capacitor sit **14.5 mm beyond the original PCB edge**.
+R2/R3 remain **100 kΩ**, C14 connects `V_MCU` to `PSW`, and ALERT is unconnected.
+The neck enforces 0.15 mm tracks for `V_MCU`/SDA/SCL and 0.20 mm for `PSW`,
+with no vias/components; the continuous back GND fill and repaired GND connection remain.
+
+[Current schematic](gerbers_schematic/schematic_nfc_baterry_free_fpc.pdf) ·
+[Gerbers and drills](gerbers_schematic/gerbers_fpc) ·
+[PCB layout](exports/pcb.pdf) · [3D render](exports/3d-oblique.png) ·
+[BOM](exports/bom.csv) · [Placements](exports/placement.csv)
+
+The original CAD stackup is retained, including its recorded **1.6 mm** thickness.
+`exports/densor_nfc_v2.step` contains the native stackup and components;
+`exports/board-1.6mm.step` is the nominal board envelope. Actual flex construction
+and bend radius are unspecified in the original. Model sources and licenses are in
+`Densor_kicad_project/vendor/`.
+
+Latest checks: zero unrouted connections and no new DRC/ERC/parity findings.
+The 31 DRC, 19 ERC and 20 metadata findings are inherited. Final I²C, wake/sleep
+and bent/epoxied fit measurements across 2.6–1.8 V remain pending.
+The purchasing links below are historical; use the schematic BOM for current
+values, and complete its missing MPN fields before ordering.
 
 ## About the project 
 
@@ -13,11 +34,12 @@ This folder contains all the harware design files.
 
 ## Folder layout
 
-- [Densor Kicad Project](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/hardware/Densor_kicad_project) contains the KiCad design files and can be opened with KiCad Version 8.
-- [Datasheets](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/hardware/datasheets) contains the relavant datasheets of components used.
-- [Gerbers Schematic](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/hardware/gerbers_schematic) contains the hardware output gerber files and schematic file in _.pdf_ format. This is useful if you wish to build Densor without any changes to the hardware.  
+- [KiCad project](Densor_kicad_project/densor_nfc_v2.kicad_pro): current design, local symbols, footprints and all 25 component STEP models.
+- [Datasheets](datasheets): component reference PDFs.
+- [Gerbers and schematic](gerbers_schematic): current extension Gerbers, drills, job file and schematic PDF.
+- [Exports](exports): PCB views, renders, assembly drawings, BOM, placements and STEP files.
 
-## List of components
+## Historical baseline purchasing references
 
 | Component                  | Qty | Purchased from                                                                                                                                                                                                            |
 |----------------------------|-----|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
