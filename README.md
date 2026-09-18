@@ -18,6 +18,9 @@ At present, in mouth measurements are typically made with external tools and in 
 
 ## Project layout
 
+For the current NFC firmware (R2/R3 multirate logging), Android app, build
+commands and protocol documentation, see the [software guide](NFC_harvester_battery_free/software/README.md).
+
 This repository contains the design (both hardware and software) of two versions of Densor, based on the source of energy harvesting. Each version of the project is contained in its own folder:
 
 1. **[Densor with NFC-based energy harvesting from a smartphone](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free)**, as presented in [this research article](https://dl.acm.org/doi/10.1145/3699746);

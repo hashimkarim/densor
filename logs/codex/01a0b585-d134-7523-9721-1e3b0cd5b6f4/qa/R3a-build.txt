@@ -1,0 +1,4 @@
+make: Entering directory '/home/hashim/Documents/phd/densor/NFC_harvester_battery_free/software/DentalSensor_StorageProject'
+python3 ../tools/multirate_manifest.py build/partitioned-fsm/densor-r3a-partitioned-fsm.elf partitioned fsm
+R3a partitioned/fsm: Flash 12780/16384, static RAM 348/2048, retained RAM 64/256
+make: Leaving directory '/home/hashim/Documents/phd/densor/NFC_harvester_battery_free/software/DentalSensor_StorageProject'

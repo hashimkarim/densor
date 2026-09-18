@@ -1,0 +1,68 @@
+{
+  "checked_at": "2026-09-18T19:24:01.151513+02:00",
+  "variants": [
+    {
+      "software_revision": "R2a",
+      "storage": "shared",
+      "timing": "fsm",
+      "source_revision": "e7071cc26c322cbbcf9dd7eb7e25287b1a03332e",
+      "source_dirty": false,
+      "sha256": "33bf9711ddc622709bb91d65607701d44bf3e42121ba1f56ad9c2890b4503750",
+      "flash_load_extent_bytes": 12348,
+      "sram_static_bytes": 348,
+      "rtc_retained_ram_bytes": 64,
+      "compiler": "arm-none-eabi-gcc (Fedora 15.2.0-4.fc44) 15.2.0",
+      "release_ready": false
+    },
+    {
+      "software_revision": "R2b",
+      "storage": "shared",
+      "timing": "rtc",
+      "source_revision": "e7071cc26c322cbbcf9dd7eb7e25287b1a03332e",
+      "source_dirty": false,
+      "sha256": "ae1f6e37b3701074914e7cf1b142fc90744cc892feb360c52daccbfc84d77028",
+      "flash_load_extent_bytes": 12356,
+      "sram_static_bytes": 348,
+      "rtc_retained_ram_bytes": 64,
+      "compiler": "arm-none-eabi-gcc (Fedora 15.2.0-4.fc44) 15.2.0",
+      "release_ready": false
+    },
+    {
+      "software_revision": "R3a",
+      "storage": "partitioned",
+      "timing": "fsm",
+      "source_revision": "e7071cc26c322cbbcf9dd7eb7e25287b1a03332e",
+      "source_dirty": false,
+      "sha256": "8c0f3a05922eb45e0c13318ee6e2579c8b4d93773a2c16da8f08fb4c4d6b6071",
+      "flash_load_extent_bytes": 12780,
+      "sram_static_bytes": 348,
+      "rtc_retained_ram_bytes": 64,
+      "compiler": "arm-none-eabi-gcc (Fedora 15.2.0-4.fc44) 15.2.0",
+      "release_ready": false
+    },
+    {
+      "software_revision": "R3b",
+      "storage": "partitioned",
+      "timing": "rtc",
+      "source_revision": "e7071cc26c322cbbcf9dd7eb7e25287b1a03332e",
+      "source_dirty": false,
+      "sha256": "1dbaecf17ec4dde60532b3a785e4285425ceba456a07cf04c71818d4d1af3806",
+      "flash_load_extent_bytes": 12764,
+      "sram_static_bytes": 348,
+      "rtc_retained_ram_bytes": 64,
+      "compiler": "arm-none-eabi-gcc (Fedora 15.2.0-4.fc44) 15.2.0",
+      "release_ready": false
+    }
+  ],
+  "checks": {
+    "test_multirate.py": "passed: all four sanitizer-tested variants, 340 board scenarios, 360 C-writer images, 360 Java-to-C-to-Java requests, golden bytes and Android fixture equality",
+    "test_r1.py": "passed: storage/configuration/TMP119 tests, 110 board checks, 45 C-writer images, 210 reconstructed historical samples",
+    "documentation_links": "passed for current and historical firmware guides",
+    "git_diff_check": "passed"
+  },
+  "limitations": [
+    "Incremental make targets; objects already up to date",
+    "No Android APK build or phone testing in this update",
+    "No device flashing, physical NFC or hardware measurement"
+  ]
+}

@@ -1,5 +1,10 @@
 # Densor with NFC-based Energy Harvesting from a Smartphone
 
+For the current R1/R2/R3 software, use the [firmware and Android guide](software/README.md).
+The memory diagram and Time Sync/Charge operating steps below describe the
+original published firmware. R2/R3 use independent sensor periods and the
+Stop/Apply workflow documented in the current guide.
+
 <img src="images/densor_assembled.jpg" width="800">
 
 This is the official public repository for intraoral sensing platform, called Densor (a portmanteau of a word _dental_ and _sensor_), based on [NFC protocol](https://en.wikipedia.org/wiki/Near-field_communication) for energy harvesting and communication from a NFC-enabled smartphone. For a Densor version with thermoelectric energy harvesting from drinking cold water please refer to [this repository](https://github.com/TUDSSL/densor/tree/master/TEG_harvester_battery_free). 
