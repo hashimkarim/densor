@@ -27,7 +27,8 @@ import java.util.concurrent.Executors;
 /** Real app fragments backed by virtual EEPROM; never opens an NFC adapter. */
 public final class DensorDebugActivity extends AppCompatActivity implements STFragment.STFragmentListener {
     private static final String[] EXAMPLES = {"r1-mask-3.bin", "historical-reconstructed-r1.bin",
-            "historical-reconstructed-legacy.bin"};
+            "historical-reconstructed-legacy.bin", "multirate-partitioned-fsm.bin", "multirate-partitioned-rtc.bin",
+            "multirate-shared-fsm.bin", "multirate-shared-rtc.bin"};
     private DebugDensorTag tag;
     private final ExecutorService files = Executors.newSingleThreadExecutor();
     private TextView sourceView, fileStatus;

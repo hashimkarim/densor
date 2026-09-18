@@ -68,7 +68,7 @@ def main():
         if args.update_fixtures:
             shutil.copy2(phone_assets / name, debug_assets / name)
         assert (debug_assets / name).read_bytes() == (phone_assets / name).read_bytes(), "Debug fixture differs from checked phone fixture"
-    run(["javac", "-d", BUILD, JAVA / "DensorProtocol.java", JAVA / "data/DensorDataSample.java",
+    run(["javac", "-d", BUILD, JAVA / "DensorProtocol.java", JAVA / "DensorMultirate.java", JAVA / "data/DensorDataSample.java",
          JAVA / "data/DensorDataSet.java", ROOT / "tests/ProtocolTest.java"])
     print(run(["java", "-ea", "-cp", BUILD, "ProtocolTest", BUILD, fixtures]).stdout.strip())
     print(f"Golden firmware bytes match; sanitizers={'address,undefined' if sanitize else 'disabled explicitly'}")

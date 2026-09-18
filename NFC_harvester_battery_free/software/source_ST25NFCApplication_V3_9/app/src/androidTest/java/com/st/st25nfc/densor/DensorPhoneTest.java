@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Spinner;
 import android.widget.ScrollView;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -59,7 +61,8 @@ public final class DensorPhoneTest {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity = (FixtureActivity)instrumentation.startActivitySync(intent);
         instrumentation.runOnMainSync(() -> activity.show(fragment));
-        awaitStatus(fragment, "R1");
+        DensorProtocol.Info info=DensorProtocol.inspect(dump,capacity);
+        awaitStatus(fragment, info.multirate?DensorMultirate.revision(info.storage,info.timing):"R1");
     }
     private void awaitStatus(DensorFragment fragment, String expected) throws Exception {
         long deadline = android.os.SystemClock.uptimeMillis() + 5000;
@@ -86,6 +89,11 @@ public final class DensorPhoneTest {
                 if (button.getText().toString().equals(text)) { button.performClick(); return; }
             fail("Missing button " + text);
         });
+    }
+    private TextView capacityPreview(DensorFragment fragment) {
+        for(TextView view:widgets(fragment.getView(),TextView.class))
+            if("Proposed recording capacity".contentEquals(view.getContentDescription()==null?"":view.getContentDescription())) return view;
+        throw new AssertionError("Missing capacity preview");
     }
     @After public void finish() {
         if (activity != null) instrumentation.runOnMainSync(() -> activity.finish());
@@ -186,4 +194,124 @@ public final class DensorPhoneTest {
         });
         screenshot("historical-reconstruction");
     }
+    @Test public void multirateAllFourImagesDecodeAndExport() throws Exception {
+        for(String storage:new String[]{"partitioned","shared"}) for(String timing:new String[]{"fsm","rtc"}) {
+            DensorDataSet data=new DensorDataSet(asset("multirate-"+storage+"-"+timing+".bin"),2048);
+            assertTrue(data.getInfo().complete());assertEquals(25,data.getInfo().samples());
+            assertArrayEquals(new int[]{3,5,9,25},data.getInfo().recordCounts);
+            assertEquals(Long.valueOf(240),data.getTimestamps().get(24));
+            assertEquals(Float.valueOf(24f),data.getSamples().get(0).getTemp());
+            assertEquals(Float.valueOf(-1f),data.getSamples().get(0).getTmp119());
+            assertNull(data.getSamples().get(1).getTemp());assertNull(data.getSamples().get(1).getTmp119());
+            String revision=(storage.equals("shared")?"R2":"R3")+(timing.equals("fsm")?"a":"b");
+            assertTrue(data.toCsv().contains("\n"+revision.toLowerCase(java.util.Locale.ROOT)+","));
+            assertTrue(data.getInfo().summary().startsWith(revision+" / "));
+        }
+    }
+    @Test public void multirateSettingsPreserveIndependentRatesAndInstalledStrategies() throws Exception {
+        DensorSettingsFragment fragment=new DensorSettingsFragment();
+        launch(asset("multirate-partitioned-fsm.bin"),2048,fragment);
+        instrumentation.runOnMainSync(()-> {
+            widgets(fragment.getView(),Spinner.class).get(0).setSelection(2);
+            List<EditText> inputs=widgets(fragment.getView(),EditText.class);
+            assertEquals(6,inputs.size());inputs.get(0).setText("10");inputs.get(2).setText("120");inputs.get(3).setText("60");
+        });
+        click(fragment,"Apply settings and reset log");awaitStatus(fragment,"have not changed yet");
+        DensorProtocol.Info info=DensorNfc.info(FixtureActivity.fixture);
+        assertEquals(1,info.storage);assertEquals(1,info.timing);assertEquals(15,info.mask);assertEquals(3,info.pendingMask);
+        assertArrayEquals(new int[]{12,6,0,0},info.pendingMultipliers);assertEquals(12,FixtureActivity.fixture.writes);
+        assertArrayEquals(new int[]{157,313,0,0},info.pendingPages);
+        click(fragment,"Refresh active / pending settings");awaitStatus(fragment,"Pending request");
+        screenshot("multirate-partitioned-settings");
+    }
+    @Test public void partitionPreviewRecalculatesWhileEditingWithoutWritingHeader() throws Exception {
+        DensorSettingsFragment fragment=new DensorSettingsFragment();
+        byte[] original=asset("multirate-partitioned-fsm.bin");launch(original,2048,fragment);
+        instrumentation.runOnMainSync(()->widgets(fragment.getView(),Spinner.class).get(0).setSelection(2));
+        instrumentation.waitForIdleSync();
+        instrumentation.runOnMainSync(()-> {
+            List<EditText> inputs=widgets(fragment.getView(),EditText.class);
+            inputs.get(2).setText("120");inputs.get(3).setText("120");
+            TextView preview=capacityPreview(fragment);
+            assertTrue(preview.getText().toString().contains("LIS2DW12 temperature: 120 s; capacity 235 records (940 bytes)"));
+            assertTrue(preview.getText().toString().contains("TMP119 temperature: 120 s; capacity 235 records (940 bytes)"));
+            inputs.get(3).setText("60");
+            assertTrue(preview.getText().toString().contains("LIS2DW12 temperature: 120 s; capacity 157 records (628 bytes)"));
+            assertTrue(preview.getText().toString().contains("TMP119 temperature: 60 s; capacity 313 records (1252 bytes)"));
+            assertTrue(preview.getText().toString().contains("unused 0 bytes"));
+            inputs.get(0).setText("7");
+            assertTrue(preview.getText().toString().contains("positive multiple"));
+            assertFalse(preview.getText().toString().contains("records"));
+            inputs.get(0).setText("");assertTrue(preview.getText().toString().contains("whole-number base"));
+            inputs.get(0).setText("10");
+            inputs.get(4).setText(""); // Disabled sensors never block a valid proposal.
+            assertTrue(preview.getText().toString().contains("1252 bytes"));
+            CheckBox pd=widgets(fragment.getView(),CheckBox.class).get(0);pd.setChecked(true);
+            assertTrue(preview.getText().toString().contains("each enabled sensor"));
+            inputs.get(4).setText("30");
+            assertTrue(preview.getText().toString().contains("Photodiode: 30 s; capacity"));
+            pd.setChecked(false);assertTrue(preview.getText().toString().contains("1252 bytes"));
+            ((ScrollView)fragment.getView()).scrollTo(0,preview.getParent() instanceof View?((View)preview.getParent()).getTop()+preview.getTop():0);
+        });
+        assertEquals(0,FixtureActivity.fixture.writes);assertArrayEquals(original,FixtureActivity.fixture.memory);
+        screenshot("multirate-automatic-partitions");
+        click(fragment,"Apply settings and reset log");awaitStatus(fragment,"have not changed yet");
+        assertArrayEquals(new int[]{12,6,0,0},DensorNfc.info(FixtureActivity.fixture).pendingMultipliers);
+    }
+    @Test public void sharedPreviewUsesOnePoolAndRespondsToRateChanges() throws Exception {
+        DensorSettingsFragment fragment=new DensorSettingsFragment();launch(asset("multirate-shared-rtc.bin"),2048,fragment);
+        instrumentation.runOnMainSync(()-> {
+            List<EditText> inputs=widgets(fragment.getView(),EditText.class);
+            TextView preview=capacityPreview(fragment);
+            inputs.get(2).setText("120");
+            assertTrue(preview.getText().toString().contains("Proposed R2b shared pool"));
+            assertTrue(preview.getText().toString().contains("Pooled capacity 1880 bytes; expected stop at 28200 s"));
+            inputs.get(2).setText("60");
+            assertTrue(preview.getText().toString().contains("Pooled capacity 1880 bytes; expected stop at 14100 s"));
+            assertFalse(preview.getText().toString().contains("automatic partitions"));
+        });
+        assertEquals(0,FixtureActivity.fixture.writes);
+        click(fragment,"Apply settings and reset log");awaitStatus(fragment,"have not changed yet");
+        DensorProtocol.Info info=DensorNfc.info(FixtureActivity.fixture);
+        assertEquals(2,info.storage);assertEquals(2,info.timing);
+        assertArrayEquals(new int[]{6,0,0,0},info.pendingMultipliers);
+        assertArrayEquals(new int[]{470,0,0,0},info.pendingPages);
+    }
+    @Test public void r3bSettingsUseRtcSchedulerAndAutomaticPartitions() throws Exception {
+        DensorSettingsFragment fragment=new DensorSettingsFragment();launch(asset("multirate-partitioned-rtc.bin"),2048,fragment);
+        instrumentation.runOnMainSync(()-> {
+            assertTrue(fragment.status.getText().toString().contains("R3b / Partitioned / RTC time"));
+            assertTrue(capacityPreview(fragment).getText().toString().contains("Proposed R3b automatic partitions"));
+            widgets(fragment.getView(),EditText.class).get(2).setText("60");
+            assertTrue(capacityPreview(fragment).getText().toString().contains("capacity 470 records (1880 bytes)"));
+        });
+        assertEquals(0,FixtureActivity.fixture.writes);
+        click(fragment,"Apply settings and reset log");awaitStatus(fragment,"have not changed yet");
+        DensorProtocol.Info info=DensorNfc.info(FixtureActivity.fixture);
+        assertEquals(1,info.storage);assertEquals(2,info.timing);
+        assertArrayEquals(new int[]{6,0,0,0},info.pendingMultipliers);
+        assertArrayEquals(new int[]{470,0,0,0},info.pendingPages);
+        click(fragment,"Refresh active / pending settings");awaitStatus(fragment,"Pending request");
+        screenshot("multirate-r3b-settings");
+    }
+    @Test public void multiratePlotsRenderDifferentTemperaturePeriods() throws Exception {
+        DataViewFragment fragment=new DataViewFragment();launch(asset("multirate-shared-rtc.bin"),2048,fragment);
+        awaitStatus(fragment,"Latest TMP119");
+        instrumentation.runOnMainSync(()-> {
+            List<XYPlot> plots=widgets(fragment.getView(),XYPlot.class);
+            assertEquals(View.VISIBLE,plots.get(0).getVisibility());assertEquals(View.VISIBLE,plots.get(1).getVisibility());
+            assertTrue(fragment.status.getText().toString().contains("120 s"));assertTrue(fragment.status.getText().toString().contains("60 s"));
+            ((ScrollView)fragment.getView()).scrollTo(0,plots.get(0).getTop());
+        });
+        screenshot("multirate-shared-temperatures");
+    }
+    @Test public void multirateStopIsPendingUntilRealFirmwareAcknowledgement() throws Exception {
+        byte[] dump=asset("multirate-shared-fsm.bin");dump[78]=2;DensorProtocol.put16(dump,90,DensorProtocol.crc16(dump,76,14));
+        DensorSettingsFragment fragment=new DensorSettingsFragment();launch(dump,2048,fragment);
+        click(fragment,"Stop and checkpoint recording");awaitStatus(fragment,"Stop requested");
+        DensorProtocol.Info info=DensorNfc.info(FixtureActivity.fixture);
+        assertEquals(DensorProtocol.RUNNING,info.state);assertEquals(DensorMultirate.STOP,info.pendingCommand);
+        assertTrue(info.pendingId>info.acknowledgedId);assertFalse(info.complete());assertEquals(12,FixtureActivity.fixture.writes);
+    }
+
 }

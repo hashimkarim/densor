@@ -22,5 +22,9 @@
         <item>Both temperatures (synthetic fixture)</item>
         <item>Historical CSV reconstructed as R1 (210 samples)</item>
         <item>Historical CSV reconstructed as legacy (210 samples)</item>
+        <item>R3a / partitions / retained FSM (synthetic)</item>
+        <item>R3b / partitions / RTC timer (synthetic)</item>
+        <item>R2a / shared pool / retained FSM (synthetic)</item>
+        <item>R2b / shared pool / RTC timer (synthetic)</item>
     </string-array>
 </resources>

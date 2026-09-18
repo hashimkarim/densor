@@ -42,20 +42,24 @@ public final class DensorProtocol {
     }
     public static boolean periodValid(long period) { return period > 0 && (period < 60 || (period <= 3540 && period % 60 == 0)); }
     public static final class Info {
-        public boolean legacy, timeValid;
+        public boolean legacy, timeValid, multirate;
+        public int storage, timing, lcm;
+        public final int[] multipliers=new int[4], pendingMultipliers=new int[4], pendingPages=new int[4], starts=new int[4], ends=new int[4], pointers=new int[4], recordCounts=new int[4];
+        public final ArrayList<Long> sampleTimes=new ArrayList<>();
         public int version, capacity, pointer, logStart, mask, stride, period, state, error, detected, oscillator, legacyMask, delay;
         public long sessionId, acknowledgedId, pendingId, startTime;
         public int pendingCommand, pendingMask, pendingPeriod, pendingDelay;
-        public boolean complete() { return !legacy && state != RUNNING && state != CONFIGURING; }
-        public int samples() { return stride == 0 ? 0 : (pointer - logStart) / stride; }
+        public boolean complete() { return multirate ? state==STOPPED && error==0 && pendingId<=acknowledgedId : !legacy && state != RUNNING && state != CONFIGURING; }
+        public int samples() { return multirate ? sampleTimes.size() : stride == 0 ? 0 : (pointer - logStart) / stride; }
         public String wakeNotice() {
             return "Settings/reset apply on the next regular wake (current interval: "
-                    + (periodValid(period) ? period : 120) + " s).";
+                    + ((multirate ? period>0 : periodValid(period)) ? period : 120) + " s).";
         }
         public String summary() {
+            if(multirate) return DensorMultirate.summary(this);
             if (legacy) return "Legacy recording (read-only): " + samples() + " samples, " + period + " s interval";
             String[] states = {"Stopped", "Configuring", "Running", "Error", "Full"};
-            return "R1 v" + version + " / " + states[state] + " / session " + sessionId + "\nActive: " + sensorNames(mask)
+            return "R1 / " + states[state] + " / session " + sessionId + "\nActive: " + sensorNames(mask)
                     + ", " + period + " s; startup delay " + delay / 60 + " min; " + samples() + " samples\n"
                     + "Memory: " + pointer + "/" + capacity + " bytes; " + (stride == 0 ? 0 : (capacity - pointer) / stride)
                     + " samples remaining\nLast confirmed sensors: " + sensorNames(detected)
@@ -68,7 +72,7 @@ public final class DensorProtocol {
     }
     public static String errorName(int error) {
         String[] errors = {"none", "bus/write readiness failure", "invalid header", "invalid pointer", "invalid configuration",
-                "selected sensor missing or failed", "memory full", "invalid state", "acquisition timeout"};
+                "selected sensor missing or failed", "memory full", "invalid state", "acquisition timeout", "schedule phase lost; start a new session", "ambiguous/corrupt recovery state"};
         return error >= 0 && error < errors.length ? errors[error] : "unknown error";
     }
     public static String sensorNames(int mask) {
@@ -84,6 +88,7 @@ public final class DensorProtocol {
     public static Info inspect(byte[] b, int physicalCapacity) {
         require(physicalCapacity == 512 || physicalCapacity == 2048 || physicalCapacity == 8192, "Unsupported tag density");
         require(b.length >= 9, "Truncated header");
+        if (ascii(b,0,"DENSOR2!")) return DensorMultirate.inspect(b,physicalCapacity);
         if (!ascii(b, 0, "DENSOR1!")) {
             require(!ascii(b, 0, "DEN") && !ascii(b, HEADER, "DNR"), "Damaged or unsupported Densor header; cannot use legacy decoding");
             return legacy(b, physicalCapacity);
@@ -142,6 +147,10 @@ public final class DensorProtocol {
         return request(info, command, mask, period, oscillator, 0);
     }
     public static byte[] request(Info info, int command, int mask, int period, int oscillator, int startupMinutes) {
+        if(info.multirate) {
+            int[] m=new int[4]; for(int i=0;i<4;i++) if((mask&(1<<i))!=0) m[i]=1;
+            return DensorMultirate.request(info,command,mask,period,m,oscillator,startupMinutes);
+        }
         require(!info.legacy, "Legacy firmware is read-only. Export, flash R1 and provision through SWD first.");
         require(info.version == 3, "This older R1 format is read-only. Export, update firmware and reprovision before configuring.");
         require(startupMinutes >= 0 && startupMinutes <= 59, "Startup delay must be 0–59 minutes (0 disables it)");
@@ -155,6 +164,7 @@ public final class DensorProtocol {
         put32(p, 12, period); put32(p, 16, info.sessionId); put16(p, 30, crc16(p, 0, 30)); return p;
     }
     public static ArrayList<DensorDataSample> decode(byte[] dump, Info info) {
+        if(info.multirate) return DensorMultirate.decode(dump,info);
         require(dump.length == info.pointer, "Recording length does not match its pointer");
         ArrayList<DensorDataSample> samples = new ArrayList<>();
         if (info.stride == 0) return samples;

@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--export", required=True, type=Path, help="Saved pre-migration binary recording")
     parser.add_argument("--interface", required=True, help="OpenOCD probe config, e.g. interface/stlink.cfg")
     parser.add_argument("--apply", action="store_true")
+    parser.add_argument("--protocol", choices=["r1", "multirate"], default="r1", help="Must match the selected firmware image")
     args = parser.parse_args()
     elf = args.elf.resolve(strict=True)
     saved = args.export.resolve(strict=True).read_bytes()
@@ -30,19 +31,21 @@ def main():
             symbols[parts[2]] = int(parts[0], 16)
     for required in ["densor_boot_gate", "densor_provision_request"]:
         if required not in symbols:
-            parser.error(f"ELF does not contain the R1 provisioning symbol {required}")
+            parser.error(f"ELF does not contain the provisioning symbol {required}")
     gate = symbols["densor_boot_gate"] & ~1
     flag = symbols["densor_provision_request"]
+    magic = "0x44525035" if args.protocol == "multirate" else "0x44525031"
+    label = "R2/R3" if args.protocol == "multirate" else "R1"
     commands = [f"program {{{elf}}} verify", "reset halt", f"bp 0x{gate:x} 2 hw",
-                "resume", "wait_halt 5000", f"rbp 0x{gate:x}", f"mww 0x{flag:x} 0x44525031", "resume", "shutdown"]
+                "resume", "wait_halt 5000", f"rbp 0x{gate:x}", f"mww 0x{flag:x} {magic}", "resume", "shutdown"]
     argv = ["openocd", "-f", args.interface, "-f", "target/stm32l0.cfg"]
     for command in commands:
         argv += ["-c", command]
     print("Pre-migration export SHA-256:", hashlib.sha256(saved).hexdigest())
-    print("External EEPROM will be initialized as an empty, stopped R1 device.")
+    print(f"External EEPROM will be initialized as an empty, stopped {label} device.")
     if args.apply:
         subprocess.run(argv, check=True)
-        print("Flashing/provisioning requested. Read and validate the stopped R1 header in Android before use.")
+        print(f"Flashing/provisioning requested. Read and validate the stopped {label} header in Android before use.")
     else:
         print("Dry run. Re-run with --apply only after checking the saved export and selecting the correct board/probe.")
         print("OpenOCD commands:\n" + "\n".join(commands))

@@ -27,20 +27,21 @@ public final class DensorNfc {
         return result;
     }
     public static synchronized DensorProtocol.Info info(NFCTag tag) throws Exception {
-        byte[] before = readExact(tag, 0, 128), after = readExact(tag, 0, 128);
+        byte[] before = readExact(tag, 0, DensorMultirate.LOG), after = readExact(tag, 0, DensorMultirate.LOG);
         DensorProtocol.Info result = DensorProtocol.inspect(before, memorySize(tag));
-        if (!Arrays.equals(before, after)) throw new IllegalStateException("Tag changed during reading; refresh after its wake");
+        int length=result.multirate?result.logStart:result.legacy?9:DensorProtocol.LOG_START;
+        if (!Arrays.equals(Arrays.copyOf(before,length), Arrays.copyOf(after,length))) throw new IllegalStateException("Tag changed during reading; refresh after its wake");
         return result;
     }
     public static synchronized DensorDataSet recording(NFCTag tag) throws Exception {
-        byte[] before = readExact(tag, 0, 128);
+        byte[] before = readExact(tag, 0, DensorMultirate.LOG);
         DensorProtocol.Info info = DensorProtocol.inspect(before, memorySize(tag));
         if (info.state == DensorProtocol.CONFIGURING && !info.legacy) throw new IllegalStateException("Session initialization is incomplete; export/reprovision required");
         byte[] dump = Arrays.copyOf(before, info.pointer);
         byte[] data = readExact(tag, info.logStart, info.pointer - info.logStart);
         System.arraycopy(data, 0, dump, info.logStart, data.length);
-        byte[] after = readExact(tag, 0, 128);
-        int immutable = info.legacy ? 9 : 92;
+        byte[] after = readExact(tag, 0, DensorMultirate.LOG);
+        int immutable = info.legacy ? 9 : info.multirate ? info.logStart : 92;
         if (!Arrays.equals(Arrays.copyOf(before, immutable), Arrays.copyOf(after, immutable)))
             throw new IllegalStateException("Recording changed while reading; read again between device wakes");
         return new DensorDataSet(dump, memorySize(tag));
@@ -56,9 +57,19 @@ public final class DensorNfc {
                 || current.pointer != expected.pointer || current.state != expected.state)
             throw new IllegalStateException("Device state changed; refresh and retry");
         byte[] request = DensorProtocol.request(current, command, mask, period, oscillator, startupMinutes);
-        verifiedWrite(tag, DensorProtocol.MARKER, new byte[4]);
+        writeRequest(tag,request);
+    }
+    public static synchronized void sendMultirate(NFCTag tag,DensorProtocol.Info expected,int command,int mask,int base,int[] multipliers,int oscillator,int startup) throws Exception {
+        DensorProtocol.Info current=info(tag);
+        if(!current.multirate || current.version!=expected.version || current.capacity!=expected.capacity || current.sessionId!=expected.sessionId || current.acknowledgedId!=expected.acknowledgedId
+            || current.state!=expected.state || current.storage!=expected.storage || current.timing!=expected.timing)
+            throw new IllegalStateException("Session changed; refresh before requesting settings");
+        writeRequest(tag,DensorMultirate.request(current,command,mask,base,multipliers,oscillator,startup));
+    }
+    private static void writeRequest(NFCTag tag,byte[] request) throws Exception {
+        verifiedWrite(tag, DensorProtocol.PENDING+request.length, new byte[4]);
         for (int offset = 0; offset < request.length; offset += 4)
             verifiedWrite(tag, DensorProtocol.PENDING + offset, Arrays.copyOfRange(request, offset, offset + 4));
-        verifiedWrite(tag, DensorProtocol.MARKER, Arrays.copyOfRange(request, 4, 8));
+        verifiedWrite(tag, DensorProtocol.PENDING+request.length, Arrays.copyOfRange(request, 4, 8));
     }
 }

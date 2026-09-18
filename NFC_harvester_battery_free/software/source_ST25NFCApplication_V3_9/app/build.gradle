@@ -68,12 +68,12 @@ android {
     sourceSets.androidTest.java.exclude "com/st/st25androidapp/androidWrapper/Type2TestSuite.java"
     buildToolsVersion "35.0.0"
     def appName = "ST25NFCTap"
-    def appVersionName = "3.10.2-r1"
+    def appVersionName = "3.11.0-multirate"
     defaultConfig {
         applicationId "com.st.st25nfc"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 28
+        versionCode 29
         versionName appVersionName
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true

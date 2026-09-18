@@ -2,13 +2,23 @@
 #include "densor_board.h"
 #include "densor_r1.h"
 #include "tmp119.h"
+#ifdef DENSOR_MULTIRATE
+#include "densor_multirate.h"
+#include "densor_logger.h"
+#include "densor_scheduler.h"
+#endif
 #include <string.h>
 
 extern ADC_HandleTypeDef hadc;
 extern I2C_HandleTypeDef hi2c1;
 enum { NFC = 0xa6, NFC_SYSTEM = 0xae, LIS = 0x32, DENSOR_RTC_ADDR = 0xd2, TMP = 0x90,
        BUS_TIMEOUT_MS = 25 };
+#ifdef DENSOR_MULTIRATE
+static mr_session session;
+static uint32_t boot_time;
+#else
 static densor_session session;
+#endif
 static bool session_loaded;
 static bool memory_write_failed;
 static uint8_t boot_seconds, boot_minutes;
@@ -51,9 +61,47 @@ static uint8_t tmp_write(uint8_t reg, uint16_t value) {
 }
 static const tmp119_bus temperature = { tmp_read, tmp_write, HAL_GetTick, HAL_Delay };
 static bool rtc_write(uint8_t reg, uint8_t value) { return write_reg(DENSOR_RTC_ADDR, reg, I2C_MEMADD_SIZE_8BIT, &value, 1); }
+#ifndef DENSOR_MULTIRATE
 static bool bcd_valid(uint8_t b) { return (b & 15) <= 9 && (b >> 4) <= 5; }
+#endif
 static uint8_t bcd_decode(uint8_t b) { return (uint8_t)((b >> 4) * 10 + (b & 15)); }
 static uint8_t bcd_encode(unsigned b) { return (uint8_t)(((b / 10) << 4) | (b % 10)); }
+#ifdef DENSOR_MULTIRATE
+/* AM18X5 §5.5: one burst latches calendar counters. No hundredths in RC mode. */
+static bool rtc_calendar(uint32_t *seconds) {
+    uint8_t b[6], control;
+    static const uint8_t days_in_month[12]={31,28,31,30,31,30,31,31,30,31,30,31};
+    if (!read_reg(DENSOR_RTC_ADDR,0x10,1,&control,1) || (control&0xc0)
+        || !read_reg(DENSOR_RTC_ADDR,1,1,b,6)) return false;
+    b[0]&=0x7f; b[1]&=0x7f; b[2]&=0x3f; b[3]&=0x3f; b[4]&=0x1f;
+    unsigned v[6];
+    for (unsigned i=0;i<6;++i) {
+        if ((b[i]&15)>9 || (b[i]>>4)>9) return false;
+        v[i]=bcd_decode(b[i]);
+    }
+    unsigned y=v[5], m=v[4], d=v[3];
+    if (v[0]>59 || v[1]>59 || v[2]>23 || !m || m>12 || !d
+        || d>days_in_month[m-1]+(unsigned)(m==2 && y%4==0)) return false;
+    uint32_t days=365u*y+(y+3)/4+d-1;
+    for (unsigned i=1;i<m;++i) days+=days_in_month[i-1]+(unsigned)(i==2 && y%4==0);
+    *seconds=((days*24+v[2])*60+v[1])*60+v[0];
+    boot_seconds=b[0]; boot_minutes=b[1]; return true;
+}
+static bool ram_bank(void) {
+    uint8_t v;
+    return read_reg(DENSOR_RTC_ADDR,0x3f,1,&v,1) && rtc_write(0x3f,v&0xfcu);
+}
+static bool ram_read(uint16_t a, uint8_t *p, uint16_t n) {
+    return a+n<=64 && ram_bank() && read_reg(DENSOR_RTC_ADDR,0x40+a,1,p,n);
+}
+static bool ram_write(uint16_t a, const uint8_t *p, uint16_t n) {
+    bool ok=a+n<=64 && ram_bank() && write_reg(DENSOR_RTC_ADDR,0x40+a,1,p,n);
+    if (!ok) memory_write_failed=true;
+    return ok;
+}
+static const mr_ram retained={ram_read,ram_write,rtc_calendar};
+static bool rtc_read_boot(void) { return rtc_calendar(&boot_time); }
+#else
 static bool rtc_read_boot(void) {
     for (unsigned n = 0; n < 3; ++n) {
         uint8_t time[2], seconds;
@@ -64,6 +112,7 @@ static bool rtc_read_boot(void) {
     }
     return false;
 }
+#endif
 static void power_off(uint32_t startup_delay) {
     /* If programming completion is unknown, do not deliberately remove power
      * or reset and retry acquisition. A failed bus may also prevent reporting
@@ -72,9 +121,25 @@ static void power_off(uint32_t startup_delay) {
     /* One configured wake interval, including full/error states. Settings are
      * picked up on that normal wake; there is no separate command-poll timer.
      * Before valid settings exist, use a two-minute default. */
+    #ifdef DENSOR_MULTIRATE
+    uint32_t period=session_loaded ? densor_u16(session.h+28) : 120;
+    uint8_t rc=session_loaded ? session.h[14] : 1;
+    (void)startup_delay;
+    if (!period) period=120;
+    if (session_loaded && session.status[2]==DENSOR_RUNNING) {
+        uint32_t now;
+        if (!rtc_calendar(&now)) { HAL_SuspendTick(); for (;;) __WFI(); }
+        uint32_t target=mr_next_time(&session);
+        if (target<=now) {
+            (void)mr_close(&memory,&retained,&session,MR_PHASE);
+        } else period=target-now;
+    }
+#else
     uint32_t period = startup_delay ? startup_delay : (session_loaded ? densor_u32(session.header + 28) : 0);
     uint8_t rc = session_loaded ? session.header[14] : 1;
     if (!densor_period_valid(period)) period = 120;
+#endif
+    if (memory_write_failed) { HAL_SuspendTick(); for (;;) __WFI(); }
     unsigned due = (bcd_decode(boot_minutes) * 60u + bcd_decode(boot_seconds) + period) % 3600;
     for (unsigned attempt = 0; attempt < 3; ++attempt) {
         /* Hourly repeat compares minute/second/hundredth, avoiding a minute
@@ -87,7 +152,11 @@ static void power_off(uint32_t startup_delay) {
         HAL_Delay(50);
     }
     /* Never reset and reacquire when the power-switch transaction fails. */
+    #ifdef DENSOR_MULTIRATE
+    if (session_loaded) (void)mr_close(&memory,&retained,&session,DENSOR_IO);
+#else
     if (session_loaded) (void)densor_fail(&memory, &session, DENSOR_IO);
+#endif
     HAL_SuspendTick();
     for (;;) __WFI();
 }
@@ -160,6 +229,44 @@ void densor_board_run(void) {
     }
     uint8_t detected = sensors_present(tmp_status);
     densor_boot_gate();
+#ifdef DENSOR_MULTIRATE
+    if (densor_provision_request==0x44525035u) {
+        densor_provision_request=0;
+        session_loaded=mr_format(&memory,&session,capacity,detected)==DENSOR_OK;
+        power_off(0);
+    }
+    uint8_t error=mr_load(&memory,&retained,&session,capacity);
+    if (error) power_off(0);
+    session_loaded=true;
+    if (mr_presence(&memory,&session,detected)) power_off(0);
+    if (!clock_ok) { (void)mr_close(&memory,&retained,&session,MR_PHASE); power_off(0); }
+    if (tmp_status!=DENSOR_OK && tmp_status!=DENSOR_SENSOR) {
+        (void)mr_close(&memory,&retained,&session,tmp_status); power_off(0);
+    }
+    error=mr_request(&memory,&retained,&session,detected,boot_time);
+    if (error) { if (error==DENSOR_IO) memory_write_failed=true; power_off(0); }
+    if (session.status[2]==DENSOR_RUNNING) {
+        uint8_t due=0; bool ready=false;
+        if (!rtc_calendar(&boot_time)) error=MR_PHASE;
+        else error=mr_scheduler_due(&session,boot_time,&due,&ready);
+        if (!error && ready) {
+            if ((session.h[12]&detected)!=session.h[12]) error=DENSOR_SENSOR;
+            else error=mr_logger_preflight(&session,due);
+            if (!error) {
+                densor_sample sample;
+                if (due) error=acquire(due,&sample);
+                if (!error) {
+                    error=mr_begin(&retained,&session);
+                    if (!error && due) error=mr_logger_append(&memory,&session,due,&sample);
+                    if (!error) error=mr_commit(&memory,&retained,&session);
+                    /* Leave interrupted markers intact; no partial checkpoint on this wake. */
+                    if (error==DENSOR_IO) { memory_write_failed=true; power_off(0); }
+                }
+            }
+        }
+        if (error) (void)mr_close(&memory,&retained,&session,error);
+    }
+#else
     if (densor_provision_request == 0x44525031u) {
         densor_provision_request = 0;
         session_loaded = densor_format(&memory, &session, capacity, detected) == DENSOR_OK;
@@ -191,5 +298,6 @@ void densor_board_run(void) {
         }
         if (error) (void)densor_fail(&memory, &session, error);
     }
+#endif
     power_off(0);
 }

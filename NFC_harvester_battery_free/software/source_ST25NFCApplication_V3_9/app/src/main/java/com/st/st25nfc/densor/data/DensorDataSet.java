@@ -1,6 +1,7 @@
 package com.st.st25nfc.densor.data;
 
 import com.st.st25nfc.densor.DensorProtocol;
+import com.st.st25nfc.densor.DensorMultirate;
 import java.util.ArrayList;
 
 /** A recording interpreted entirely from its frozen on-tag session metadata. */
@@ -12,7 +13,8 @@ public class DensorDataSet {
     public DensorDataSet(byte[] dump, int physicalCapacity) {
         binary = dump.clone(); info = DensorProtocol.inspect(binary, physicalCapacity);
         samples = DensorProtocol.decode(binary, info);
-        for (int i = 0; i < samples.size(); i++) timestamps.add((info.timeValid ? info.startTime + info.delay : 0) + (long)i * info.period);
+        if(info.multirate) timestamps.addAll(info.sampleTimes);
+        else for (int i = 0; i < samples.size(); i++) timestamps.add((info.timeValid ? info.startTime + info.delay : 0) + (long)i * info.period);
     }
     public DensorProtocol.Info getInfo() { return info; }
     public byte[] getBinary() { return binary.clone(); }
@@ -39,9 +41,9 @@ public class DensorDataSet {
         StringBuilder csv = new StringBuilder("format,session_id,snapshot_kind,sample_index,time_valid,epoch_seconds,nominal_elapsed_seconds,old_temperature_c,tmp119_temperature_c,photodiode_raw,accel_x_g,accel_y_g,accel_z_g,supply_v,legacy_future1_1,legacy_future1_2,legacy_future1_3,legacy_future1_4,legacy_future1_5,legacy_future2\n");
         for (int i = 0; i < samples.size(); i++) {
             DensorDataSample s = samples.get(i);
-            csv.append(info.legacy ? "legacy" : "r1").append(',').append(info.sessionId).append(',')
-                .append(info.complete() ? "stable" : "live").append(',').append(i).append(',').append(info.timeValid).append(',')
-                .append(info.timeValid ? timestamps.get(i).toString() : "").append(',').append((long)i * info.period).append(',')
+            csv.append(info.legacy ? "legacy" : info.multirate ? DensorMultirate.csvFormat(info) : "r1").append(',').append(info.sessionId).append(',')
+                .append(info.multirate ? (info.complete()?"complete":info.state==DensorProtocol.RUNNING?"live-snapshot":"recovered-prefix") : info.complete() ? "stable" : "live").append(',').append(i).append(',').append(info.timeValid).append(',')
+                .append(info.timeValid ? timestamps.get(i).toString() : "").append(',').append(info.multirate ? timestamps.get(i) : (long)i * info.period).append(',')
                 .append(value(s.getTemp())).append(',').append(value(s.getTmp119())).append(',').append(value(s.getPd()));
             for (Float a : s.getAccel()) csv.append(',').append(value(a));
             csv.append(',').append(value(s.getVdda()));

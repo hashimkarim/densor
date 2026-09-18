@@ -17,7 +17,7 @@ public class TimeSyncFragment extends DensorFragment {
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         LinearLayout root = column();
         TextView help = new TextView(requireContext());
-        help.setText("Save existing data in Data before resetting. Reset keeps the current sensors, interval and startup delay. Firmware clears the log on the next regular wake, then starts after that one-time delay.\n\nR1 timestamps are nominal elapsed seconds. Live exports are snapshots; logging may continue until reset is accepted."); root.addView(help);
+        help.setText("Save existing data in Data before resetting. Reset keeps the current sensors, interval and startup delay. Firmware clears the log on the next regular wake, then starts after that one-time delay.\n\nTimestamps are nominal elapsed seconds. Multi-rate sessions must be stopped and exported before reset. Live exports are snapshots; logging may continue until reset is accepted."); root.addView(help);
         button(root, "Refresh session", v -> fillView());
         button(root, "Reset log using current settings", v -> reset());
         ScrollView scroll = new ScrollView(requireContext()); scroll.addView(root); initView(); return scroll;
@@ -30,7 +30,8 @@ public class TimeSyncFragment extends DensorFragment {
         perform(tag -> {
             DensorProtocol.Info info = DensorNfc.info(tag);
             if (info.mask == 0) throw new IllegalStateException("Choose sensor settings first");
-            DensorNfc.send(tag, info, DensorProtocol.APPLY_SETTINGS, info.mask, info.period, info.oscillator, info.delay / 60);
+            if(info.multirate) DensorNfc.sendMultirate(tag,info,DensorProtocol.APPLY_SETTINGS,info.mask,info.period,info.multipliers,info.oscillator,info.delay/60);
+            else DensorNfc.send(tag, info, DensorProtocol.APPLY_SETTINGS, info.mask, info.period, info.oscillator, info.delay / 60);
             return () -> status.setText("Reset requested. " + info.wakeNotice() + " Recording restarts after acknowledgement and the configured startup delay.");
         });
     }

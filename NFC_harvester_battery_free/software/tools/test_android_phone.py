@@ -17,7 +17,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 APP = ROOT / "source_ST25NFCApplication_V3_9"
-OUT = ROOT / "build/phone-r1"
+OUT = ROOT / "build/phone-multirate"
 
 
 def apk(directory):
@@ -46,7 +46,7 @@ def main():
 
     def adb(*command):
         result = subprocess.run([sys.executable, str(args.coordinator), "run", "--serial", claim["serial"],
-            "--token", claim["token"], "--timeout", "90", "--", *map(str, command)], capture_output=True, text=True)
+            "--token="+claim["token"], "--timeout", "90", "--", *map(str, command)], capture_output=True, text=True)
         text = result.stdout + result.stderr
         transcripts.append({"command": list(map(str, command)), "exit_code": result.returncode, "output": text})
         if result.returncode:
@@ -64,7 +64,7 @@ def main():
         results = adb("shell", "am", "instrument", "--user", "0", "-w", "-e", "class",
                       "com.st.st25nfc.densor.DensorPhoneTest", "com.st.st25nfc.test/androidx.test.runner.AndroidJUnitRunner")
         (OUT / "instrumentation-results.txt").write_text(results)
-        if not re.search(r"OK \(6 tests\)", results) or "FAILURES" in results:
+        if not re.search(r"OK \(13 tests\)", results) or "FAILURES" in results:
             raise RuntimeError("Phone test failure:\n" + results)
         adb("pull", "/sdcard/Android/data/com.st.st25nfc/files/densor-phone-tests", OUT)
     finally:
@@ -78,12 +78,12 @@ def main():
     report = {
         "tested_at_utc": datetime.now(timezone.utc).isoformat(),
         "device_model": model, "android_version": android, "api_level": int(api),
-        "application_id": "com.st.st25nfc", "version": "3.10.2-r1", "version_code": 28,
+        "application_id": "com.st.st25nfc", "version": "3.11.0-multirate", "version_code": 29,
         "release_apk_sha256": sha(release), "fixture_apk_sha256": sha(fixture), "test_apk_sha256": sha(tests),
         "release_install_and_launch": "passed; release APK restored after fixture tests",
         "same_signer_reinstall": "passed without clearing data",
         "historical_deployed_apk_upgrade": "unverified; original deployed APK/certificate unavailable",
-        "fixture_ui_tests": 6, "fixture_ui_result": "passed", "real_nfc_exchange": "unmeasured; no Densor tag available",
+        "fixture_ui_tests": 13, "fixture_ui_result": "passed", "real_nfc_exchange": "unmeasured; no Densor tag available",
         "fixture_scope": "Actual release fragment code plus a phoneTest-only host and memory-backed NFCTag; no RF, MCU acknowledgement or sensor acquisition",
         "screenshots_sha256": {p.name: sha(p) for p in sorted((OUT / "densor-phone-tests").glob("*.png"))},
     }

@@ -21,7 +21,7 @@ import com.st.st25nfc.densor.data.DensorDataSample;
 import com.st.st25nfc.densor.data.DensorDataSet;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.text.DecimalFormat;
 
 /** Separate temperatures and checked exports labelled as live or stable. */
@@ -71,17 +71,21 @@ public class DataViewFragment extends DensorFragment {
             plot.setRangeBoundaries(range[0] - padding, range[1] + padding, BoundaryMode.FIXED);
         }
         plot.setTag(range);
-        plot.addSeries(new SimpleXYSeries(data.getTimestamps(), Arrays.asList(values), name), new LineAndPointFormatter(color, color, null, null));
+        ArrayList<Long> x=new ArrayList<>(); ArrayList<Number> y=new ArrayList<>();
+        ArrayList<Long> times=data.getTimestamps();
+        for(int i=0;i<values.length;i++) if(values[i]!=null) { x.add(times.get(i));y.add(values[i]); }
+        plot.addSeries(new SimpleXYSeries(x, y, name), new LineAndPointFormatter(color, color, null, null));
     }
+    private static Float last(Float[] values) { for(int i=values.length-1;i>=0;i--) if(values[i]!=null) return values[i]; return null; }
     private static String value(Float value) { return value == null ? "unavailable" : value.toString(); }
     private void display() {
         DensorProtocol.Info info = data.getInfo();
         String kind = info.legacy ? "Legacy snapshot: stop the original device before migration."
-                : info.complete() ? "Stable recording prefix through the acknowledged pointer." : "Live snapshot; logging can continue after this read.";
+                : info.complete() ? "Complete recording through the stopped, acknowledged checkpoint." : "Snapshot / recovered prefix; read again after an acknowledged stop for a complete export.";
         String latest = "";
         if (info.samples() > 0) {
             DensorDataSample sample = data.getSamples().get(info.samples() - 1);
-            latest = "\nLatest LIS2DW12: " + value(sample.getTemp()) + " °C\nLatest TMP119: " + value(sample.getTmp119()) + " °C\nSupply: " + value(sample.getVdda());
+            latest = "\nLatest LIS2DW12: " + value(last(data.getTemp())) + " °C\nLatest TMP119: " + value(last(data.getTmp119())) + " °C\nSupply: " + value(last(data.getVdda()));
         }
         status.setText(info.summary() + "\n" + kind + latest);
         XYPlot[] plots = {oldPlot, tmpPlot, pdPlot, accelPlot, supplyPlot, future1Plot, future2Plot};
@@ -112,7 +116,7 @@ public class DataViewFragment extends DensorFragment {
             exportBytes = csv ? data.toCsv().getBytes(StandardCharsets.UTF_8) : data.getBinary();
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT); intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType(csv ? "text/csv" : "application/octet-stream");
-            intent.putExtra(Intent.EXTRA_TITLE, "densor-" + (data.getInfo().legacy ? "legacy-snapshot" : "r1-session-" + data.getInfo().sessionId
+            intent.putExtra(Intent.EXTRA_TITLE, "densor-" + (data.getInfo().legacy ? "legacy-snapshot" : (data.getInfo().multirate?"multirate-session-":"r1-session-") + data.getInfo().sessionId
                     + (data.getInfo().complete() ? "-stable" : "-live-snapshot")) + (csv ? ".csv" : ".bin"));
             startActivityForResult(intent, 710);
         } catch (Exception e) { status.setText("Export failed: " + e.getMessage()); }
