@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/debug_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        android:text="@string/densor_debug_explanation" />
+
+    <TextView
+        android:id="@+id/debug_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="4dp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/debug_open_dump"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/densor_debug_open" />
+        <Button
+            android:id="@+id/debug_export_dump"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/densor_debug_export" />
+        <Button
+            android:id="@+id/debug_new_tag"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/densor_debug_new" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/debug_file_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="16dp"
+        android:text="@string/densor_debug_unsaved" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:orientation="horizontal">
+        <Button android:id="@+id/debug_show_settings" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/densor_debug_settings" />
+        <Button android:id="@+id/debug_show_data" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/densor_debug_data" />
+        <Button android:id="@+id/debug_show_reset" android:layout_width="0dp"
+            android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/densor_debug_reset" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/debug_settings"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</LinearLayout>

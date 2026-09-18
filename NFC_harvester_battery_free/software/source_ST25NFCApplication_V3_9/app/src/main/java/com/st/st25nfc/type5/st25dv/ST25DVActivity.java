@@ -44,8 +44,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.st.st25nfc.R;
-import com.st.st25nfc.densor.DensorCommon;
-import com.st.st25nfc.densor.data.DensorDataSet;
+import com.st.st25nfc.densor.DensorNfc;
+import com.st.st25nfc.densor.DensorProtocol;
 import com.st.st25nfc.generic.ST25Menu;
 import com.st.st25sdk.NFCTag;
 import com.st.st25sdk.STException;
@@ -195,7 +195,7 @@ public class ST25DVActivity extends STFragmentActivity
     @Override
     public void onPause() {
         super.onPause();
-        connectionCheckThread.interrupt();
+        if (connectionCheckThread != null) connectionCheckThread.interrupt();
     }
 
     @Override
@@ -213,75 +213,34 @@ public class ST25DVActivity extends STFragmentActivity
      * Task to check the connection to a Densor every second. Will either report connected (memory pointer if running, charge level when in charge mode) or not connected.
      */
     class ConnectionCheckAction implements Runnable {
-        private boolean tagInField = false;
-
         public void run() {
             NFCTag tag = getTag();
-
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 if (tag != null && handler != null) {
-                    Log.i("ConnectionCheck", "Still running!");
                     try {
-                        // Read the two MSBs of the start time registers.
-                        byte[] tsBuff = tag.readBytes(DensorCommon.timeRegister, 2);
-                        float ts = (float) ((((int) (tsBuff[0] & 0xff)) << 8) | (tsBuff[1] & 0xff)) / 1000;;
-
-                        // Read the memory pointer.
-                        byte [] mempointerBuff = tag.readBytes(DensorCommon.memoryPointerRegister,2);
-                        int mp = (int) ((((int) (mempointerBuff[1] & 0xff)) << 8) + (mempointerBuff[0] & 0xff)) ;
-
-                        // No exception thrown, Densor is connected.
-                        Log.i("ConnectionCheck", "NFC tag in field");
-
-                        // If the two MSBs of the time start register are bigger then or equal to 3.4, the Densor is running. Report the memory pointer.
-                        if (ts >= 3.4 && !tagInField) {
-                            tagInField = true;
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    if (mp == 8192){
-                                        nfcStatusText.setText(String.format("Densor running. Possible Glitch %s",mp));
-                                    }
-                                    else {
-                                        nfcStatusText.setText(String.format("Densor running. Bytes written: %s", mp));
-                                    }
-                                    nfcStatusImage.setImageResource(android.R.drawable.presence_online);
-                                }
-                            });
-                        // The two MSBs of the time start register are smaller then 3.4, the Densor is in charge mode. Report charge level.
-                        } else if (ts < 3.4) {
-                            tagInField = true;
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    nfcStatusText.setText(String.format("NFC tag in range! Charging status: %s V", ts));
-                                    nfcStatusImage.setImageResource(android.R.drawable.presence_online);
-                                }
-                            });
-                        }
-
-                    } catch (STException e) {
-                        // Connection failed. Report not connected.
-                        if (tagInField) {
-                            tagInField = false;
-                            handler.post(new Runnable() {
-                                public void run() {
-                                    nfcStatusText.setText(R.string.nfc_tag_is_not_in_range);
-                                    nfcStatusImage.setImageResource(android.R.drawable.presence_offline);
-                                }
-                            });
-                        }
-                        Log.w("ConnectionCheck", "NFC tag not in field");
-                    }
-                    try {
-                        // Sleep for a second and check again.
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        return;
+                        DensorProtocol.Info info = DensorNfc.info(tag);
+                        String label = info.legacy ? "Legacy Densor (read-only): " + info.samples() + " samples"
+                            : "Densor R1: " + info.samples() + " samples, " + info.pointer + "/" + info.capacity + " bytes"
+                                + (info.error == 0 ? "" : "; " + DensorProtocol.errorName(info.error));
+                        handler.post(() -> {
+                            nfcStatusText.setText(label);
+                            nfcStatusImage.setImageResource(android.R.drawable.presence_online);
+                        });
+                    } catch (IllegalArgumentException e) {
+                        handler.post(() -> {
+                            nfcStatusText.setText("Unsupported or inconsistent Densor recording: " + e.getMessage());
+                            nfcStatusImage.setImageResource(android.R.drawable.presence_busy);
+                        });
+                    } catch (Exception e) {
+                        handler.post(() -> {
+                            nfcStatusText.setText(R.string.nfc_tag_is_not_in_range);
+                            nfcStatusImage.setImageResource(android.R.drawable.presence_offline);
+                        });
                     }
                 }
+                try { Thread.sleep(1000); }
+                catch (InterruptedException e) { Thread.currentThread().interrupt(); return; }
             }
         }
     }
 }
-
-

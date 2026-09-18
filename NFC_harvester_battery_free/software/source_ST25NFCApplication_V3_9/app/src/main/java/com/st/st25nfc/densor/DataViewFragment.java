@@ -1,412 +1,133 @@
 package com.st.st25nfc.densor;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
-import com.androidplot.xy.BoundaryMode;
-import com.androidplot.xy.CatmullRomInterpolator;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import com.androidplot.xy.LineAndPointFormatter;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
-import com.androidplot.xy.XYSeries;
-import com.st.st25nfc.densor.data.DensorDataSet;
-import com.st.st25nfc.generic.STFragment;
-import com.st.st25nfc.generic.STFragmentActivity;
-import com.st.st25sdk.NFCTag;
+import com.androidplot.xy.XYGraphWidget;
+import com.androidplot.xy.BoundaryMode;
+import com.androidplot.xy.StepMode;
 import com.st.st25nfc.R;
-import com.st.st25sdk.STException;
-import java.nio.ByteBuffer;
+import com.st.st25nfc.densor.data.DensorDataSample;
+import com.st.st25nfc.densor.data.DensorDataSet;
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.text.DecimalFormat;
 
-/**
- * Fragment to load and show data from a Densor.
- */
-public class DataViewFragment extends STFragment implements View.OnClickListener{
-
-    /**
-     * Text view to display status updates like errors or successful downloads.
-     */
-    private TextView statusView;
-    /**
-     * Handler to update update fragment from child threads.
-     */
-    private Handler handler;
-    /**
-     * Thread used to download data from the Densor.
-     */
-    private Thread actionThread;
-    /**
-     * Holder to keep a loaded dataset.
-     */
+/** Separate temperatures and checked exports labelled as live or stable. */
+public class DataViewFragment extends DensorFragment {
     private DensorDataSet data;
-    /**
-     * Plot to show a temperature trace from a loaded dataset.
-     */
-    private XYPlot tempPlt;
-    /**
-     * Plot to show a photo-diode trace from a loaded dataset.
-     */
-    private XYPlot pdPlt;
-    /**
-     * Plot to show a future1 traces from a loaded dataset.
-     */
-    private XYPlot future1Plt;
-    /**
-     * Plot to show a future2 trace from a loaded dataset.
-     */
-    private XYPlot future2Plt;
-    /**
-     * Plot to show a accelerometer traces from a loaded dataset.
-     */
-    private XYPlot accelPlt;
-    /**
-     * Plot to show a supply voltage trace from a loaded dataset.
-     */
-    private XYPlot vddaPlt;
-    /**
-     * Button to download a dataset from a Densor.
-     */
-    private Button downloadButton;
-
-    /**
-     * Creates a new instance of this fragment.
-     *
-     * @param context Context to which this fragment should be connected.
-     *
-     * @return The new data view fragment
-     */
+    private XYPlot oldPlot, tmpPlot, pdPlot, accelPlot, supplyPlot, future1Plot, future2Plot;
+    private byte[] exportBytes;
+    private Context appContext;
     public static DataViewFragment newInstance(Context context) {
-        DataViewFragment f = new DataViewFragment();
-
-        // Set the title of this fragment
-        f.setTitle(context.getResources().getString(R.string.data_view));
-
-        return f;
+        DataViewFragment fragment = new DataViewFragment(); fragment.setTitle("Densor data"); return fragment;
     }
-
-    /**
-     * Creates a new data view fragment.
-     */
-    public DataViewFragment() {
+    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
+        LinearLayout root = column(); appContext = requireContext().getApplicationContext();
+        button(root, "Read recording", v -> fillView());
+        button(root, "Save binary recording", v -> export(false));
+        button(root, "Save CSV", v -> export(true));
+        oldPlot = plot(root, "LIS2DW12 temperature (°C)"); tmpPlot = plot(root, "TMP119 temperature (°C)");
+        pdPlot = plot(root, "Photodiode (raw ADC)"); accelPlot = plot(root, "Acceleration (g)");
+        supplyPlot = plot(root, "Supply (V, coarse telemetry)");
+        future1Plot = plot(root, "Legacy future1"); future2Plot = plot(root, "Legacy future2");
+        accelPlot.getLegend().setVisible(true); future1Plot.getLegend().setVisible(true);
+        ScrollView scroll = new ScrollView(requireContext()); scroll.addView(root); initView(); return scroll;
     }
-
-    /**
-     * Called to do initial creation of the data view fragment.
-     *
-     * @param savedInstanceState If the fragment is being re-created from
-     * a previous saved state, this is the state.
-     */
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
-
-    /**
-     * Called to have the fragment instantiate its user interface view.
-     *
-     * @param inflater The LayoutInflater object that can be used to inflate
-     * any views in the fragment.
-     * @param container If non-null, this is the parent view that the fragment's
-     * UI should be attached to.  The fragment should not add the view itself,
-     * but this can be used to generate the LayoutParams of the view.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed
-     * from a previous saved state as given here.
-     *
-     * @return the user interface view for the data view fragment.
-     */
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        final View view = inflater.inflate(R.layout.fragment_densor_data_view, container, false);
-        mView = view;
-
-        statusView = (TextView) view.findViewById(R.id.densor_data_view_status);
-
-        handler = new Handler();
-
-        tempPlt = (XYPlot) mView.findViewById(R.id.densor_data_view_temp_plt);
-        pdPlt = (XYPlot) mView.findViewById(R.id.densor_data_view_pd_plt);
-        future1Plt = (XYPlot) mView.findViewById(R.id.densor_data_view_future1_plt);
-        future2Plt = (XYPlot) mView.findViewById(R.id.densor_data_view_future2_plt);
-        accelPlt = (XYPlot) mView.findViewById(R.id.densor_data_view_accel_plt);
-        vddaPlt = (XYPlot) mView.findViewById(R.id.densor_data_view_vdda_plt);
-
-        downloadButton = (Button) mView.findViewById(R.id.densor_data_view_download);
-        downloadButton.setOnClickListener(this);
-
-        initView();
-        return (View) view;
+    private XYPlot plot(LinearLayout root, String title) {
+        XYPlot plot = (XYPlot)LayoutInflater.from(requireContext()).inflate(R.layout.densor_plot, root, false);
+        plot.setTitle(title); root.addView(plot);
+        plot.setDomainStep(StepMode.SUBDIVIDE, 4); plot.setRangeStep(StepMode.SUBDIVIDE, 5);
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.LEFT).setFormat(new DecimalFormat("0.##"));
+        plot.getGraph().getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).setFormat(new DecimalFormat("0"));
+        plot.setVisibility(View.GONE); return plot;
     }
-
-    /**
-     * On-click listener callback for the download button.
-     *
-     * @param v The view that was clicked.
-     */
-    @Override
-    public void onClick(View v) {
-        if (actionThread != null)
-            try {
-                actionThread.join();
-            } catch (InterruptedException e) {
-                Log.e("Dataview", "Issue joining thread");
-            }
-
-        actionThread = new Thread(new DataViewAction());
-        actionThread.start();
+    @Override public void fillView() {
+        if (status == null || mView == null) return;
+        perform(tag -> {
+            DensorDataSet recording = DensorNfc.recording(tag);
+            return () -> { data = recording; display(); };
+        });
     }
-
-    /**
-     * Called when this fragment is first connected to its context.
-     *
-     * @param context The context this fragment is connected to.
-     */
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-    }
-
-    /**
-     * Called when the Fragment is no longer resumed.
-     */
-    @Override
-    public void onPause() {
-        if (actionThread != null)
-            try {
-                actionThread.join();
-            } catch (InterruptedException e) {
-                Log.e("TimeSync", "Issue joining thread");
-            }
-        super.onPause();
-    }
-
-    /**
-     * Called when the fragment is visible to the user and actively running.
-     */
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    // TODO: Remove
-//    /**
-//     * Task used to fill the graphs in this fragment on a separate thread.
-//     */
-//    private class FillViewTask extends STFragment.FillViewTask {
-//
-//        /**
-//         * Creates a new fill view task. Will fill the graphs of this fragment.
-//         */
-//        public FillViewTask() {
-//        }
-//
-//        @Override
-//        protected Integer doInBackground(NFCTag... param) {
-//            return 0;
-//        }
-//
-//
-//        @Override
-//        protected void onPostExecute(Integer result) {
-//
-//            if (actionThread != null) {
-//                try {
-//                    actionThread.join();
-//                } catch (InterruptedException e) {
-//                    Log.e("DataViewFragment", "Issue joining thread");
-//                }
-//            }
-//
-//        }
-//    }
-
-    /**
-     * Tasks used to download data from a connected Densor, deserialize it and plot it on the view.
-     */
-    class DataViewAction implements Runnable {
-        /**
-         * Download data from a connected Densor, deserialize it and plot it on the view.
-         */
-        public void run() {
-            // Check if a tag is connected.
-            NFCTag tag = ((STFragmentActivity) requireActivity()).getTag();
-            if (tag == null) {
-                if (handler != null && statusView != null) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            statusView.setText(String.format("Error: %s", "unable to read tag!"));
-                        }
-                    });
-                }
-                showToast(R.string.invalid_tag);
-                return;
-            }
-
-            // Download all registers.
-            byte[] registers;
-
-            try {
-                registers = tag.readBytes(0x0, DensorCommon.dataStartAddr);
-            } catch (STException e) {
-                if (handler != null && statusView != null) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            statusView.setText(String.format("Error: %s", e.getMessage()));
-                        }
-                    });
-                }
-
-                showToast(R.string.reading_tag_failed);
-                return;
-            }
-
-            // Split and convert the downloaded registers, obtain the memory pointer.
-            byte sensorState = registers[DensorCommon.sensorStateRegister];
-            byte[] timeRegisterBuff = {
-                    registers[DensorCommon.timeRegister],
-                    registers[DensorCommon.timeRegister + 1],
-                    registers[DensorCommon.timeRegister + 2],
-                    registers[DensorCommon.timeRegister + 3]
-            };
-            int timestamp = ByteBuffer.wrap(timeRegisterBuff).getInt();
-            byte rtcInterval = registers[DensorCommon.rtcInvertalRegister];
-            byte startupDelay = registers[DensorCommon.startupDelayRegister];
-            int memoryPointer = (((int) (registers[DensorCommon.memoryPointerRegister + 1] & 0xff)) << 8) | (registers[DensorCommon.memoryPointerRegister] & 0xff);
-
-            // Download all data till the memory pointer
-            byte[] dataBuff;
-
-            try {
-                dataBuff = tag.readBytes(DensorCommon.dataStartAddr, memoryPointer - DensorCommon.dataStartAddr); // Load all registers
-            } catch (STException e) {
-                if (handler != null && statusView != null) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            statusView.setText(String.format("Error: %s", e.getMessage()));
-                        }
-                    });
-                }
-
-                showToast(R.string.reading_tag_failed);
-                return;
-            }
-
-            // Deserialize the loaded data.
-            DensorDataSet ds = new DensorDataSet(dataBuff, (int) rtcInterval, (int) startupDelay, sensorState, timestamp);
-
-            // Update the status view to report the successful download.
-            if (handler != null) {
-                handler.post(new Runnable() {
-                    public void run() {
-                        statusView.setText(String.format("Loaded data, starting at: %s", timestamp));
-                        data = ds;
-                    }
-                });
-            }
-
-            // Log all loaded sensor data.
-            Log.i("Dataview", "Dataset:");
-            Log.i("Dataview", "temp:" + Arrays.toString(ds.getTemp()));
-            Log.i("Dataview", "pd:" + Arrays.toString(ds.getPd()));
-            Log.i("Dataview", "accel:[[" + Arrays.toString(ds.getAccel()[0]) + "],[" + Arrays.toString(ds.getAccel()[1]) + "],[" + Arrays.toString(ds.getAccel()[1]) + "]]");
-            Log.i("Dataview", "vdda:" + Arrays.toString(ds.getVdda()));
-
-            showToast(R.string.read_success);
-
-            // Update the graphs in the view.
-            if (mView != null) {
-                // Clear all graphs.
-                tempPlt.clear();
-                pdPlt.clear();
-                future1Plt.clear();
-                future2Plt.clear();
-                accelPlt.clear();
-                vddaPlt.clear();
-
-                // Get the time range.
-                Number leftBound = (Number) (ds.getTimestamps().get(0) - 60);
-                Number rightBound = (Number) (ds.getTimestamps().get(ds.getTimestamps().size() - 1) + 60);
-
-                LineAndPointFormatter series1Format =
-                        new LineAndPointFormatter(getContext(), R.xml.line_point_formatter_with_labels);
-                series1Format.setInterpolationParams(
-                        new CatmullRomInterpolator.Params(10, CatmullRomInterpolator.Type.Centripetal));
-
-                // Plot the temperature graph.
-                XYSeries tempSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getTemp()), "Temperature");
-                tempPlt.addSeries(tempSeries, series1Format);
-                tempPlt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-                // Plot the photo-diode graph.
-                XYSeries pdSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getPd()), "Photodiode");
-                pdPlt.addSeries(pdSeries, series1Format);
-                pdPlt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-
-                // Plot the future1 graph.
-                XYSeries future11Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture1()[0]), "future1 1");
-                XYSeries future12Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture1()[1]), "future1 2");
-                XYSeries future13Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture1()[2]), "future1 3");
-                XYSeries future14Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture1()[3]), "future1 4");
-                XYSeries future15Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture1()[4]), "future1 5");
-                future1Plt.addSeries(future11Series, series1Format);
-                future1Plt.addSeries(future12Series, series1Format);
-                future1Plt.addSeries(future13Series, series1Format);
-                future1Plt.addSeries(future14Series, series1Format);
-                future1Plt.addSeries(future15Series, series1Format);
-                future1Plt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-                // Plot the future2 graph.
-                XYSeries future2Series = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getFuture2()), "future 2");
-                future2Plt.addSeries(future2Series, series1Format);
-                future2Plt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-                XYSeries accelXSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getAccel()[0]), "Accel x");
-                XYSeries accelYSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getAccel()[1]), "Accel y");
-                XYSeries accelZSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getAccel()[2]), "Accel z");
-
-                accelPlt.addSeries(accelXSeries, series1Format);
-                accelPlt.addSeries(accelYSeries, series1Format);
-                accelPlt.addSeries(accelZSeries, series1Format);
-                tempPlt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-                // Plot the supply voltage graph.
-                XYSeries vddaSeries = new SimpleXYSeries(
-                        ds.getTimestamps(), Arrays.asList(ds.getVdda()), "VDDA");
-                vddaPlt.addSeries(vddaSeries, series1Format);
-                vddaPlt.setRangeBoundaries(1.7, 3.4, BoundaryMode.FIXED);
-                vddaPlt.setDomainBoundaries(leftBound, rightBound, BoundaryMode.FIXED);
-
-                // Draw all graphs.
-                tempPlt.redraw();
-                pdPlt.redraw();
-                future1Plt.redraw();
-                future2Plt.redraw();
-                accelPlt.redraw();
-                vddaPlt.redraw();
-
-            }
-
+    private void series(XYPlot plot, Number[] values, String name, int color) {
+        double[] range = (double[])plot.getTag();
+        if (range == null) range = new double[]{Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY};
+        for (Number value : values) if (value != null) {
+            range[0] = Math.min(range[0], value.doubleValue()); range[1] = Math.max(range[1], value.doubleValue());
         }
+        if (!Double.isInfinite(range[0]) && !Double.isInfinite(range[1])) {
+            double padding = Math.max(0.1, (range[1] - range[0]) * 0.05);
+            plot.setRangeBoundaries(range[0] - padding, range[1] + padding, BoundaryMode.FIXED);
+        }
+        plot.setTag(range);
+        plot.addSeries(new SimpleXYSeries(data.getTimestamps(), Arrays.asList(values), name), new LineAndPointFormatter(color, color, null, null));
     }
-
-    // TODO: Remove!
-    @Override
-    public void fillView() {
-//        new FillViewTask().execute(myTag);
+    private static String value(Float value) { return value == null ? "unavailable" : value.toString(); }
+    private void display() {
+        DensorProtocol.Info info = data.getInfo();
+        String kind = info.legacy ? "Legacy snapshot: stop the original device before migration."
+                : info.complete() ? "Stable recording prefix through the acknowledged pointer." : "Live snapshot; logging can continue after this read.";
+        String latest = "";
+        if (info.samples() > 0) {
+            DensorDataSample sample = data.getSamples().get(info.samples() - 1);
+            latest = "\nLatest LIS2DW12: " + value(sample.getTemp()) + " °C\nLatest TMP119: " + value(sample.getTmp119()) + " °C\nSupply: " + value(sample.getVdda());
+        }
+        status.setText(info.summary() + "\n" + kind + latest);
+        XYPlot[] plots = {oldPlot, tmpPlot, pdPlot, accelPlot, supplyPlot, future1Plot, future2Plot};
+        for (XYPlot plot : plots) { plot.clear(); plot.setTag(null); plot.setVisibility(View.GONE); plot.setDomainLabel(info.timeValid ? "Epoch seconds" : "Nominal elapsed seconds"); }
+        if (info.samples() == 0) return;
+        double first = data.getTimestamps().get(0).doubleValue(), last = data.getTimestamps().get(info.samples() - 1).doubleValue();
+        double timePadding = Math.max(0.5, info.period * 0.5);
+        for (XYPlot plot : plots) plot.setDomainBoundaries(first - timePadding, last + timePadding, BoundaryMode.FIXED);
+        if ((info.mask & DensorProtocol.OLD) != 0) { oldPlot.setVisibility(View.VISIBLE); series(oldPlot, data.getTemp(), "LIS2DW12", Color.CYAN); }
+        if ((info.mask & DensorProtocol.TMP119) != 0) { tmpPlot.setVisibility(View.VISIBLE); series(tmpPlot, data.getTmp119(), "TMP119", Color.YELLOW); }
+        if ((info.mask & DensorProtocol.PD) != 0) { pdPlot.setVisibility(View.VISIBLE); series(pdPlot, data.getPd(), "Photodiode", Color.GREEN); }
+        if ((info.mask & DensorProtocol.ACCEL) != 0) {
+            accelPlot.setVisibility(View.VISIBLE); Float[][] axes = data.getAccel();
+            series(accelPlot, axes[0], "X", Color.RED); series(accelPlot, axes[1], "Y", Color.GREEN); series(accelPlot, axes[2], "Z", Color.CYAN);
+        }
+        if ((info.mask & 7) != 0) { supplyPlot.setVisibility(View.VISIBLE); series(supplyPlot, data.getVdda(), "Supply", Color.MAGENTA); }
+        if (info.legacy && (info.legacyMask & 4) != 0) {
+            future1Plot.setVisibility(View.VISIBLE); Integer[][] readings = data.getFuture1();
+            int[] colors = {Color.RED, Color.GREEN, Color.CYAN, Color.YELLOW, Color.MAGENTA};
+            for (int i = 0; i < 5; i++) series(future1Plot, readings[i], "future1 " + (i + 1), colors[i]);
+        }
+        if (info.legacy && (info.legacyMask & 2) != 0) { future2Plot.setVisibility(View.VISIBLE); series(future2Plot, data.getFuture2(), "future2", Color.CYAN); }
+        for (XYPlot plot : plots) plot.redraw();
+    }
+    private void export(boolean csv) {
+        if (data == null) { status.setText("Read a recording first"); return; }
+        try {
+            exportBytes = csv ? data.toCsv().getBytes(StandardCharsets.UTF_8) : data.getBinary();
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT); intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType(csv ? "text/csv" : "application/octet-stream");
+            intent.putExtra(Intent.EXTRA_TITLE, "densor-" + (data.getInfo().legacy ? "legacy-snapshot" : "r1-session-" + data.getInfo().sessionId
+                    + (data.getInfo().complete() ? "-stable" : "-live-snapshot")) + (csv ? ".csv" : ".bin"));
+            startActivityForResult(intent, 710);
+        } catch (Exception e) { status.setText("Export failed: " + e.getMessage()); }
+    }
+    @Override public void onActivityResult(int requestCode, int resultCode, Intent result) {
+        super.onActivityResult(requestCode, resultCode, result);
+        if (requestCode != 710) return;
+        try {
+            if (resultCode != Activity.RESULT_OK || result == null || result.getData() == null || exportBytes == null) return;
+            try (OutputStream out = appContext.getContentResolver().openOutputStream(result.getData(), "w")) {
+                if (out == null) throw new IllegalStateException("No writable export destination");
+                out.write(exportBytes); out.flush();
+            }
+            if (isAdded() && status != null) status.setText("Export saved. A live snapshot excludes samples logged after the read.");
+        } catch (Exception e) { if (isAdded() && status != null) status.setText("Export failed: " + e.getMessage()); }
+        finally { exportBytes = null; }
     }
 }

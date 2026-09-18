@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-09-18T13:14:08.285843+00:00",
+  "agent": "codex",
+  "thread_id": "01a0b4a3-17e8-70f3-8938-8997dc9c470f",
+  "input": "is it only available after scanning a tag? i dont see it in the main menu?",
+  "output": [
+    {
+      "channel": "commentary",
+      "text": "I’ll check how the app opens the Densor screens and whether they’re only available after a tag scan."
+    },
+    {
+      "channel": "final",
+      "text": "Yes—**in the current app, the Densor controls appear after scanning a compatible ST25DV NFC tag.** They aren’t available from the initial main menu.\n\nTo reach them:\n\n1. Open the app with NFC enabled and scan Densor.\n2. The app opens a screen titled **Densor**.\n3. Select the **Densor Settings** tab, or open the side menu → **Densor features → Densor Settings**.\n\nThe main menu’s device entry starts hidden. After scanning, it becomes a shortcut labelled **“ST25DV menus”**, which is a leftover ST name. That behavior is in [MainActivity.java](/mnt/shared/Git/densor/NFC_harvester_battery_free/software/source_ST25NFCApplication_V3_9/app/src/main/java/com/st/st25nfc/generic/MainActivity.java:627).\n\nThere’s currently **no offline preview of the Densor controls**: the [Densor screen checks for a recognized tag and returns home if none exists](/mnt/shared/Git/densor/NFC_harvester_battery_free/software/source_ST25NFCApplication_V3_9/app/src/main/java/com/st/st25nfc/type5/st25dv/ST25DVActivity.java:92)."
+    }
+  ],
+  "status": "complete"
+}

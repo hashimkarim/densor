@@ -1,0 +1,6 @@
+
+com.st.st25nfc.densor.DensorPhoneTest:......
+
+Time: 7.991
+
+OK (6 tests)

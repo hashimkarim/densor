@@ -9,6 +9,7 @@ public class DensorDataSample {
      * The temperature reading of the sample.
      */
     private Float temp;
+    private Float tmp119;
     /**
      * The photo-diode readings of the sample.
      */
@@ -41,7 +42,12 @@ public class DensorDataSample {
      * @param vdda The supply voltage reading of the sample.
      */
     public DensorDataSample(Float temp, Integer pd, Integer[] future1, Integer future2, Float[] accel, Float vdda){
+        this(temp, null, pd, future1, future2, accel, vdda);
+    }
+
+    public DensorDataSample(Float temp, Float tmp119, Integer pd, Integer[] future1, Integer future2, Float[] accel, Float vdda){
         this.temp = temp;
+        this.tmp119 = tmp119;
         this.pd = pd;
         this.future1 = future1;
         this.future2 = future2;
@@ -57,6 +63,8 @@ public class DensorDataSample {
     public Float getTemp() {
         return temp;
     }
+
+    public Float getTmp119() { return tmp119; }
 
     /**
      * Returns the photo-diode reading of the sample.

@@ -1,0 +1,15 @@
+{
+  "application_id": "com.st.st25nfc.dbg",
+  "version": "3.10.2-r1",
+  "apk_sha256": "7fd1a7eff85cbcfdb6c76ef126aa8e60e717ed229a972d16eb910445317ec7a1",
+  "device": "Samsung S21 FE / SM-G990B / Android 16",
+  "install_launch_debug_entry": "passed",
+  "settings_data_tabs": "passed",
+  "startup_delay_control": "visible",
+  "real_nfc_and_firmware": "unmeasured; virtual EEPROM only",
+  "screenshots_sha256": {
+    "debug-data.png": "2c9558942f6c0c751a8cef81553260021efc26fadb39db3f0eada72c2b7afe80",
+    "debug-settings.png": "b36373ea2f82e5bc3d9c7e425df1a6a96c2637c3caffa107a02271e85e001dc5",
+    "startup-delay.png": "0d89d654a6be266d5a83def79836ad6973128eb9cdba57cd67663dfaf758247e"
+  }
+}

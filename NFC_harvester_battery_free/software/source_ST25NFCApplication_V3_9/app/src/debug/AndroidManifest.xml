@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application>
+        <activity
+            android:name="com.st.st25nfc.densor.debug.DensorDebugActivity"
+            android:label="@string/densor_debug_title"
+            android:exported="false" />
+    </application>
+</manifest>

@@ -1,0 +1,24 @@
+{
+  "tested_at_utc": "2026-09-18T14:25:35.696755+00:00",
+  "device_model": "SM-G990B",
+  "android_version": "16",
+  "api_level": 36,
+  "application_id": "com.st.st25nfc",
+  "version": "3.10.2-r1",
+  "version_code": 28,
+  "release_apk_sha256": "d449b0f6530a065a5f27154607cd8fa8dcb678fe7c358bb1a0450ed659657607",
+  "fixture_apk_sha256": "b204d8c3903cd92149a2b9df2215b38ba6551e0e0cc07cf3c6a924913eb4a073",
+  "test_apk_sha256": "72999f56703498b6b30a3e47f2db8de27adc9d8dd006acbade5c09ac9835a536",
+  "release_install_and_launch": "passed; release APK restored after fixture tests",
+  "same_signer_reinstall": "passed without clearing data",
+  "historical_deployed_apk_upgrade": "unverified; original deployed APK/certificate unavailable",
+  "fixture_ui_tests": 6,
+  "fixture_ui_result": "passed",
+  "real_nfc_exchange": "unmeasured; no Densor tag available",
+  "fixture_scope": "Actual release fragment code plus a phoneTest-only host and memory-backed NFCTag; no RF, MCU acknowledgement or sensor acquisition",
+  "screenshots_sha256": {
+    "both-temperatures.png": "cadaf7a57a4587f06b9474245b1c79fab2ea8782d3b7c218b97c5a5da6809f4c",
+    "historical-reconstruction.png": "accd7e48326a50c1a4111a5ca72453b855fb1568ffc2a82f1e94bc972221f072",
+    "pending-settings.png": "2860aafeb1f1f4339c896434bf9b0a6cb4caa20727c1c91e4e477bb22afde411"
+  }
+}

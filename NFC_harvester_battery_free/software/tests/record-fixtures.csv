@@ -1,0 +1,8 @@
+name,mask,supply,old_raw,tmp119_raw,pd_raw,accel_x,accel_y,accel_z,record_hex
+old_positive,1,8,3072,,,,,,08000c00
+old_negative,1,4,-7680,,,,,,0400e200
+tmp_positive,2,8,,4736,,,,,08801200
+tmp_negative,2,0,,-128,,,,,0080ff00
+both_signed,3,15,-7680,-128,,,,,0f00e280ff000000
+accel_only,8,255,,,,16384,-16384,0,ff004000c0000000
+all,15,8,3072,4736,2048,16384,-16384,0,08000c80120008004000c00000000000

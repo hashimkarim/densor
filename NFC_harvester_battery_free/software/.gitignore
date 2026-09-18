@@ -1,0 +1,6 @@
+# Keep Android debug sources and checked test fixtures despite root STM32 rules.
+!source_ST25NFCApplication_V3_9/app/src/debug/
+!source_ST25NFCApplication_V3_9/app/src/debug/**/
+!source_ST25NFCApplication_V3_9/app/src/testDebug/java/com/st/st25nfc/densor/debug/
+!source_ST25NFCApplication_V3_9/app/src/debug/assets/densor-debug/*.bin
+!source_ST25NFCApplication_V3_9/app/src/androidTest/assets/*.bin

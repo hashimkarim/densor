@@ -62,13 +62,18 @@ task ST25SDKNameTask {
 
 android {
     compileSdkVersion 33
+    testBuildType "phoneTest"
+    testOptions { unitTests.includeAndroidResources = true }
+    // Upstream Type2 suite depends on an absent ST test rig/AndroidHelper.
+    sourceSets.androidTest.java.exclude "com/st/st25androidapp/androidWrapper/Type2TestSuite.java"
+    buildToolsVersion "35.0.0"
     def appName = "ST25NFCTap"
-    def appVersionName = "3.9.0"
+    def appVersionName = "3.10.2-r1"
     defaultConfig {
         applicationId "com.st.st25nfc"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 25
+        versionCode 28
         versionName appVersionName
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
         vectorDrawables.useSupportLibrary = true
@@ -81,6 +86,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "app_name", "ST25"
+        }
+
+        // Identical release code plus a fixture host, only for device tests.
+        phoneTest {
+            initWith release
+            matchingFallbacks = ["release"]
         }
 
         debug {
@@ -172,7 +183,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
     lint {
-        abortOnError false
+        abortOnError true
     }
     namespace 'com.st.st25nfc'
     testNamespace 'com.st.st25nfc.androidWrapper'
@@ -194,6 +205,10 @@ configurations {
 }
 
 dependencies {
+    testDebugImplementation "junit:junit:4.13.2"
+    testDebugImplementation "org.robolectric:robolectric:4.14.1"
+    androidTestImplementation "androidx.test:runner:1.5.2"
+    androidTestImplementation "androidx.test.ext:junit:1.1.5"
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // IMPORTANT: The next 2 lines are needed to link the ST25SDK and the AndroidReaderInterface

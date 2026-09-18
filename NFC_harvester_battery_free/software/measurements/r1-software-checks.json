@@ -1,0 +1,17 @@
+{
+  "implementation_commit": "e8e86be09119d27d09da858fc65652124fcd5f78",
+  "build_input_digest_sha256": "e9501ddd2f74641a5f8450b5786d0e50cc07c417981a3f85deb306b374bc9e3f",
+  "protocol_version": 3,
+  "workflow": "Apply settings/reset on next regular wake; optional one-time 0\u201359 minute delay before first sample; no Stop/New session/Start workflow",
+  "wake_policy": "Configured common interval except for the one-time startup delay; 120 s before valid settings exist; no separate command polling",
+  "elf_sha256": "5f7d1ce579a85c9e341bd305e7bba8342565c72822ff79294a48401211ed8142",
+  "release_apk_sha256": "d449b0f6530a065a5f27154607cd8fa8dcb678fe7c358bb1a0450ed659657607",
+  "host_checks": "Passed with ASan/UBSan: storage/configuration/TMP119 faults, 110 board-HAL scenarios including delay consumption and subsequent wakes, 45 C-produced recordings, golden vectors and 210 historical reconstructed samples",
+  "phone_checks": "6 instrumented tests passed on S21 FE / Android 16; release 3.10.2-r1 install and launch passed; startup-delay submission and reset verified",
+  "flash_load_bytes": 13504,
+  "sram_static_bytes": 312,
+  "runtime_stack_margin_bytes": null,
+  "energy_measurements": null,
+  "release_ready": false,
+  "debug_checks": "6 Robolectric tests passed: pending delay/settings, recreation, import/export, legacy read-only, validation/bounds, reset reuses delay; S21 FE install, debug entry, Settings/Data and startup-delay control checked"
+}

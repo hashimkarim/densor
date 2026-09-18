@@ -177,11 +177,18 @@ public class MainActivity extends AppCompatActivity
         mNavigationView.inflateMenu(R.menu.menu_main_activity);
         mNavigationView.inflateMenu(R.menu.menu_help);
 
+        Button debugButton = findViewById(R.id.debugDensorButton);
+        debugButton.setVisibility(BuildConfig.DEBUG ? View.VISIBLE : View.GONE);
+        debugButton.setOnClickListener(v -> startActivity(new Intent().setClassName(
+                this, "com.st.st25nfc.densor.debug.DensorDebugActivity")));
+
         mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE);
         } else {
+            // Pre-Android 12 branch: no mutability flag exists/needs setting here.
+            //noinspection UnspecifiedImmutableFlag
             mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         }
 
