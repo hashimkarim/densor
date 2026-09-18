@@ -229,3 +229,6 @@ mx.scratch
 
 ### Python ###
 __pycache__/
+
+## Ignore literature and paper due to copyright
+literature/
