@@ -1,0 +1,88 @@
+{
+  "captured_at": "2026-09-18T16:50:11.415988+00:00",
+  "head": "5401e256512333e5feae31a6e4845a5212df0ac7",
+  "scope": "Working-tree snapshot, including the concurrent R2 shared / R3 partitioned naming update. This is not a release manifest.",
+  "files": [
+    {
+      "asset": "r1-protocol.md",
+      "source": "NFC_harvester_battery_free/software/docs/r1-protocol.md",
+      "sha256": "748ff7b61fe5951ea79f0b7a35475a1d18f5cd904b1bd9854569734832ee4488"
+    },
+    {
+      "asset": "multirate-protocol.md",
+      "source": "NFC_harvester_battery_free/software/docs/multirate-protocol.md",
+      "sha256": "02e140cfe7d3f1604e4f8e355ff174c6900ebd5f14dcbc3152cbaa0d1596a119"
+    },
+    {
+      "asset": "fixture-manifest.json",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/manifest.json",
+      "sha256": "f0f0ceaae98829999afcec9b2c6ed3f26c64e9df771a9d0a2e6be01ba617e620"
+    },
+    {
+      "asset": "multirate-record-fixtures.json",
+      "source": "NFC_harvester_battery_free/software/tests/multirate-record-fixtures.json",
+      "sha256": "abfaf6f18968756fd1cd2a8ea24768fda07a1fd57d3f13beb75f55c1700c97e6"
+    },
+    {
+      "asset": "densor_logger_partitioned.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/densor_logger_partitioned.c",
+      "sha256": "fa9c76ed8f22fb7109d55e89254aab30ad1d4cdfc4896e58e18a8a047903452e"
+    },
+    {
+      "asset": "densor_logger_shared.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/densor_logger_shared.c",
+      "sha256": "1b31f64ccbdb46bcf0eeb5e766a89abd19079e26c78199b80bfd142d61a89640"
+    },
+    {
+      "asset": "DensorMultirate.java",
+      "source": "NFC_harvester_battery_free/software/source_ST25NFCApplication_V3_9/app/src/main/java/com/st/st25nfc/densor/DensorMultirate.java",
+      "sha256": "91c72d249a80457bc8f094bedae8d4f600b13c0a8d86d48f00737bd00c987820"
+    },
+    {
+      "asset": "synthetic-r1-2048.bin",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/synthetic-r1-2048.bin",
+      "sha256": "4e3a4395617ceea4347ab4bc453c9c4c6a76b776db8babf16e9ebcae8ac2b874"
+    },
+    {
+      "asset": "synthetic-r2a-2048.bin",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/synthetic-r2a-2048.bin",
+      "sha256": "691a72d05383ebb541c5b4c5288b227958c9e7838e1b4fa39578f558655d45ab"
+    },
+    {
+      "asset": "synthetic-r2b-2048.bin",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/synthetic-r2b-2048.bin",
+      "sha256": "af63a60752ff0f484ea68b0f7d1b536bec20fd570f26a0535b4de6bee72e3b66"
+    },
+    {
+      "asset": "synthetic-r3a-2048.bin",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/synthetic-r3a-2048.bin",
+      "sha256": "7f0241fa4338a345d068889787c014947aa5ffaffebcace38e9ffc4250143318"
+    },
+    {
+      "asset": "synthetic-r3b-2048.bin",
+      "source": "NFC_harvester_battery_free/software/docs/fixtures/bin-dump-export/synthetic-r3b-2048.bin",
+      "sha256": "28240601a5f0a2ca4b993e076136b9eccda482563cd85e5e9c84c9cde0310d4c"
+    },
+    {
+      "asset": "baseline-main.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/main.c",
+      "revision": "7aa87d568ecf9f50d3e38afd571a6753df553919",
+      "sha256": "072bc3fb109f765a18595fc900d25fe3551758c2c2034e0d68e522eac3420105"
+    },
+    {
+      "asset": "densor_multirate.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/densor_multirate.c",
+      "sha256": "de7632f1ccc7d32e19c0b3990c29c6abf69bf0b7a367469308f2e8e12db7bf28"
+    },
+    {
+      "asset": "densor_r1.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/densor_r1.c",
+      "sha256": "9233b8d4953abceac917977a0f135a5dceb3fe232202f5aca2ef5728e775c8e6"
+    },
+    {
+      "asset": "densor_board.c",
+      "source": "NFC_harvester_battery_free/software/DentalSensor_StorageProject/Core/Src/densor_board.c",
+      "sha256": "1d0d4fb20615b1a784bd9f617e27a5d35fd872c6b95c09d998c2bf65e37a7245"
+    }
+  ]
+}

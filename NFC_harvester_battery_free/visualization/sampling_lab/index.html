@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore Densor synthetic signals at different sampling rates and export reproducible multirate preview data.">
+  <title>Densor · Sampling lab</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.mjs"></script>
+</head>
+<body>
+  <header class="topbar"><a href="/" class="wordmark">densor<span class="brand-dot"></span></a><span class="top-caption">RESEARCH TOOLS</span><span class="pill">Synthetic dataset</span></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">SIGNAL EXPLORER / 01</p><h1>Sampling lab</h1><p class="subtitle">See what each sampling rate captures.</p></div><p id="dataset-status" class="dataset-status" role="status">Loading the 100 Hz reference recording…</p></div>
+    <div id="load-error" class="error" role="alert" hidden></div>
+    <div class="workspace">
+      <aside>
+        <form id="settings">
+          <fieldset id="settings-fields" disabled>
+            <div class="section-title"><h2>Sampling setup</h2><span>01</span></div>
+            <label class="field">Preset<select id="preset"><option value="multirate">Multirate exploration</option><option value="original">Original · every 120 s</option><option value="firmware">Firmware comparison</option><option value="custom" disabled>Custom</option></select></label>
+            <div class="rates-heading"><span>SENSOR</span><label>Units <select id="rate-unit" aria-label="Sampling slider unit"><option value="hz">Hz</option><option value="seconds">Seconds</option></select></label></div>
+            <label class="snap-control"><input id="snap-gcd" type="checkbox" checked aria-describedby="snap-hint"> Snap periods to GCD</label>
+            <p id="snap-hint" class="hint">Sliders snap to multiples of the enabled periods’ greatest common divisor.</p>
+            <div id="sensor-controls"></div>
+            <details class="export-interval">
+              <summary>Export interval</summary>
+              <p class="hint">Times are relative to the source recording.</p>
+              <div class="interval-sliders">
+                <label class="field"><span class="slider-label">Start <output id="start-value" for="start">0 s</output></span><input id="start" type="range" min="0" max="1799.99" step="0.01" value="0"></label>
+                <label class="field"><span class="slider-label">End, exclusive <output id="end-value" for="end">1,800 s</output></span><input id="end" type="range" min="0.01" max="1800" step="0.01" value="1800"></label>
+              </div>
+              <label class="field"><span class="slider-label">Sampling phase <output id="phase-value" for="phase">0 s</output></span><input id="phase" type="range" min="0" max="1799.999" step="0.001" value="0"><span class="hint">Delay from interval start to the first sample.</span></label>
+            </details>
+          </fieldset>
+        </form>
+        <div id="config-error" class="error" role="alert" hidden></div>
+        <p class="method-note">Point samples from the newest available reference row. Acceleration axes are acquired together. No averaging or anti-alias filter.</p>
+      </aside>
+      <section class="results" aria-label="Sampling results">
+        <div class="stats"><div><span>Reference</span><strong id="reference-stat">100 <small>Hz</small></strong></div><div><span>Selected observations</span><strong id="sample-stat">—</strong></div><div><span>Measurement values</span><strong id="value-stat">—</strong></div><div><span>Reference rows used</span><strong id="coverage-stat">—</strong></div></div>
+        <section class="plot-panel">
+          <div class="section-title"><div><h2 id="plot-title">Reference & samples</h2><p id="plot-description" class="hint">Zoom into an event to see what falls between observations.</p></div><span class="live-label">● LIVE PREVIEW</span></div>
+          <fieldset id="plot-mode" class="view-switch" aria-label="Signal view">
+            <label><input type="radio" name="plot-mode" value="comparison" checked><span>Reference & samples</span></label>
+            <label><input type="radio" name="plot-mode" value="resulting"><span>Resulting signal</span></label>
+          </fieldset>
+          <div class="view-controls"><div class="field"><label for="view-start">View start</label><output class="view-value" id="view-start-value" for="view-start">75 s</output></div><label class="field">Window (s)<select id="view-window" disabled><option value="5">5 seconds</option><option value="30">30 seconds</option><option value="60" selected>1 minute</option><option value="300">5 minutes</option><option value="1800">Full recording</option></select></label><label class="field event-select">Jump to event<select id="event" disabled><option value="">Choose an event…</option></select></label></div>
+          <label class="scrubber"><span class="sr-only">Move preview window</span><input id="view-start" type="range" min="0" max="1740" step="0.01" value="75" disabled></label>
+          <div id="comparison-legend" class="legend"><span><i class="line-key"></i>100 Hz reference</span><span><i class="dot-key"></i>Acquired samples</span><label><input id="held" type="checkbox"> Show last-value hold</label></div>
+          <div id="resulting-legend" class="legend" hidden><span><i class="line-key resulting-key"></i>Sampled values connected by straight lines</span></div>
+          <div id="charts" class="charts" aria-busy="true"></div>
+          <p id="plot-note" class="hint plot-note">All six channels share the same time axis. Event shading is for reference only.</p>
+        </section>
+        <section class="export-panel"><div class="section-title"><div><p class="eyebrow">FROM PREVIEW TO REPLAY</p><h2>Export sampled data</h2></div><span id="export-badge" class="badge">Lab preview</span></div>
+          <p id="export-description">Download a lab bundle with one binary per enabled sensor and a manifest of rates, units and source timestamps.</p>
+          <div class="format-note"><strong id="export-note-title">Lab preview files are for signal analysis.</strong><span id="export-note">For Android debug import, select an R1/R2/R3 EEPROM format below. Extract the .bin from the downloaded ZIP.</span></div>
+          <div class="export-actions"><label class="field">Binary format<select id="export-format"><option value="preview-v1">Lab preview v1</option></select></label><label id="capacity-field" class="field capacity-field" hidden>EEPROM capacity<select id="export-capacity"><option value="512">512 bytes</option><option value="2048">2048 bytes</option><option value="8192" selected>8192 bytes</option></select></label><button id="download" type="button" disabled>Download preview bundle ↓</button></div>
+          <div id="export-error" class="error" role="alert" hidden></div>
+          <div id="export-summary" class="hint" role="status"></div>
+        </section>
+      </section>
+    </div>
+    <footer><span>DENSOR / SYNTHETIC MULTIRATE</span><span>Simulated signals · exploratory sampling · no hardware timing model</span></footer>
+  </main>
+</body>
+</html>

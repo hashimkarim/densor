@@ -1,0 +1,28 @@
+✔ revision names select the advertised storage and scheduler in the header and sidecar (5.68361ms)
+✔ CRC vectors and all five canonical images match byte for byte (143.079943ms)
+✔ all 5 revisions × 15 sensor masks × 3 capacities decode against quantized real CSV samples (569.223176ms)
+✔ FSM/RTC pairs differ only at scheduler and header CRC bytes (1.983017ms)
+✔ capacity exact fits, empty ticks, and preflight of a whole mixed wake (403.540702ms)
+✔ invalid schedules, nonfinite/out-of-range values and missing due samples fail explicitly (12.219787ms)
+✔ rounding ties, signed extremes and disabled invalid columns do not wrap (496.479057ms)
+✔ Android rejects damaged metadata, committed records, pointer pairs and padding (346.693356ms)
+✔ real-source Android import candidates include sidecars and validate independently (627.430655ms)
+✔ firmware ZIP contains one full EEPROM image plus its synthetic JSON sidecar (291.886407ms)
+✔ real dataset matches its provenance and events remain separate (2.928128ms)
+✔ all three presets have independently calculated counts and aligned rows (1.784643ms)
+✔ off-grid rates, offsets and phases select the newest available row (3.646572ms)
+✔ end-exclusive boundaries and 100 Hz floating-point alignment are stable (15.178653ms)
+✔ disabled sensors are omitted, including invalid unused rate entries (0.294295ms)
+✔ invalid rates, windows and phases cannot produce an export (0.628885ms)
+✔ malformed source rows and mismatching metadata are rejected (0.315685ms)
+✔ preview binary matches a manually specified little-endian golden vector (0.392249ms)
+✔ Python independently unzips and decodes every multirate record (55.394115ms)
+✔ lab preview stays separate from the five firmware adapters (0.31841ms)
+ℹ tests 20
+ℹ suites 0
+ℹ pass 20
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4222.16614

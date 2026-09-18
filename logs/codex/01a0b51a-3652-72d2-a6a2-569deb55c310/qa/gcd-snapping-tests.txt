@@ -1,0 +1,32 @@
+✔ revision names select the advertised storage and scheduler in the header and sidecar (4.715676ms)
+✔ one rate adjustment aligns all enabled periods without changing the source window or disabled sensors (0.561288ms)
+✔ fractional exploration settings align to integral periods and every revision decodes (157.983991ms)
+✔ automatic alignment coarsens an oversized LCM and clamps to whole in-range multiples (0.764912ms)
+✔ R1 alignment follows the moved sensor and respects the seconds/minutes encoding boundary (0.345441ms)
+✔ CRC vectors and all five canonical images match byte for byte (122.88402ms)
+✔ all 5 revisions × 15 sensor masks × 3 capacities decode against quantized real CSV samples (500.042249ms)
+✔ FSM/RTC pairs differ only at scheduler and header CRC bytes (1.471332ms)
+✔ capacity exact fits, empty ticks, and preflight of a whole mixed wake (110.486959ms)
+✔ invalid schedules, nonfinite/out-of-range values and missing due samples fail explicitly (2.590883ms)
+✔ rounding ties, signed extremes and disabled invalid columns do not wrap (110.876463ms)
+✔ Android rejects damaged metadata, committed records, pointer pairs and padding (70.48457ms)
+✔ real-source Android import candidates include sidecars and validate independently (110.69964ms)
+✔ firmware ZIP contains one full EEPROM image plus its synthetic JSON sidecar (37.352095ms)
+✔ real dataset matches its provenance and events remain separate (3.115651ms)
+✔ all three presets have independently calculated counts and aligned rows (2.391606ms)
+✔ off-grid rates, offsets and phases select the newest available row (3.903366ms)
+✔ end-exclusive boundaries and 100 Hz floating-point alignment are stable (15.574017ms)
+✔ disabled sensors are omitted, including invalid unused rate entries (0.31281ms)
+✔ invalid rates, windows and phases cannot produce an export (0.602135ms)
+✔ malformed source rows and mismatching metadata are rejected (0.332677ms)
+✔ preview binary matches a manually specified little-endian golden vector (0.38737ms)
+✔ Python independently unzips and decodes every multirate record (64.403871ms)
+✔ lab preview stays separate from the five firmware adapters (0.285388ms)
+ℹ tests 24
+ℹ suites 0
+ℹ pass 24
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2560.672855

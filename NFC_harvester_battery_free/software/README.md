@@ -1,5 +1,14 @@
 # Densor R1 software candidate
 
+For synthetic multirate sampling experiments, use the local
+[Sampling lab webapp](../visualization/sampling_lab/README.md). It previews independent sensor
+rates and exports lab binaries or full R1/R2a/R2b/R3a/R3b EEPROM images for
+Android debug import, with synthetic provenance and capacity checks.
+
+The [visualization folder](../visualization/README.md) also contains the
+[EEPROM lab](../visualization/eeprom_lab/README.md) for comparing memory layouts
+and page crossings.
+
 R1 implements aligned combined logging, independent LIS2DW12/TMP119 temperature
 selection and a matching Android reader/configurator. It is a **software-tested
 candidate**, with hardware validation still pending.

@@ -12,6 +12,8 @@ This folder contains all the scripts to collect, process and analyse the data us
 
 ## Folder layout
 
+- [Synthetic multirate dataset](synthetic_multirate/README.md): simulated acceleration, light, and two temperature channels at 100 Hz, with noise-free curves and event labels for sampling comparisons.
+
 - [Charging:](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/data/charging)  contains the data traces of how densor charges with a smartphone. 
 - [Earpiece:](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/data/earpiece) contains the scripts used to collect data from the ear piece for the experiments that compare Densor to a similar earable platform.
 - [Experiments:](https://github.com/TUDSSL/densor/tree/master/NFC_harvester_battery_free/data/experiments) contains all scripts and data used for the machine learning experiments.

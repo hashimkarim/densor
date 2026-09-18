@@ -1,0 +1,106 @@
+{
+  "synthetic": true,
+  "seed": 20260918,
+  "numpy_version": "2.4.6",
+  "duration_s": 1800.0,
+  "reference_rate_hz": 100.0,
+  "rows": 180000,
+  "time_interval": "[0, duration_s)",
+  "sensor_count": 4,
+  "measurement_channel_count": 6,
+  "columns": [
+    "time_s",
+    "accel_x_g",
+    "accel_y_g",
+    "accel_z_g",
+    "light_norm",
+    "temp_1_c",
+    "temp_2_c"
+  ],
+  "units": [
+    "s",
+    "g",
+    "g",
+    "g",
+    "normalized_0_to_1",
+    "degC",
+    "degC"
+  ],
+  "noise": {
+    "model": "independent zero-mean Gaussian per channel and time step",
+    "standard_deviation": {
+      "accel_x_g": 0.002,
+      "accel_y_g": 0.0024,
+      "accel_z_g": 0.0022,
+      "light_norm": 0.003,
+      "temp_1_c": 0.015,
+      "temp_2_c": 0.02
+    },
+    "light_clipping": [
+      0,
+      1
+    ]
+  },
+  "temperature_relationship": "identical underlying curve; independent noise only; no calibration offset or lag difference",
+  "event_counts": {
+    "jaw_rhythm": 8,
+    "speaking": 5,
+    "mouth_open": 4,
+    "drinking": 3,
+    "posture": 5
+  },
+  "event_intervals": "[start_s, end_s); posture changes persist; drinking has a thermal recovery tail to response_end_s",
+  "parameters_are_assumed": [
+    "noise",
+    "amplitude",
+    "event duration",
+    "occurrence count",
+    "temperature recovery",
+    "speaking modulation",
+    "posture",
+    "reference rate"
+  ],
+  "model": {
+    "gravity_g": 1,
+    "temperature_baseline_c": 36.4,
+    "jaw_frequency_range_hz": [
+      0.5,
+      1.5
+    ],
+    "jaw_amplitude_range_g": [
+      0.025,
+      0.085
+    ],
+    "temperature_drop_range_c": [
+      1.3,
+      2.8
+    ],
+    "recovery_tau_range_s": [
+      35,
+      85
+    ],
+    "thermal_tail_taper_tau": [
+      5,
+      6
+    ]
+  },
+  "sources": [
+    {
+      "doi": "10.2147/NSS.S320664",
+      "basis": "jaw motion frequency range; a different sensor system"
+    },
+    {
+      "doi": "10.1145/3410531.3414309",
+      "basis": "intraoral inertial acquisition at 54 Hz; four-second windows"
+    },
+    {
+      "doi": "10.1145/3699746",
+      "basis": "Densor light/speaking and temperature/drinking relationships"
+    }
+  ],
+  "sha256": {
+    "samples.csv": "45f69ea6012272d07618c5e81aa3c703b421e86ef5b9b844750170d319fabd0f",
+    "ground_truth.csv": "9b25683a036265d3835a4dd9a14ff5adb1d190388a36741ffec6c7961d1992fc",
+    "events.csv": "e7af7136d241a9611c0491b0be5a93fcb46758249e5acf145895e689e6b52293"
+  }
+}

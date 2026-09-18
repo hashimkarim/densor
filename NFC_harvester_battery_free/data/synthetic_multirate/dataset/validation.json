@@ -1,0 +1,52 @@
+{
+  "status": "passed",
+  "rows": 180000,
+  "channels": 6,
+  "event_counts": {
+    "jaw_rhythm": 8,
+    "speaking": 5,
+    "mouth_open": 4,
+    "drinking": 3,
+    "posture": 5
+  },
+  "noise_std_measured": {
+    "accel_x_g": 0.001997752667289531,
+    "accel_y_g": 0.0023989595588303054,
+    "accel_z_g": 0.00219570398765257,
+    "light_norm": 0.0029910936165590046,
+    "temp_1_c": 0.014996832128115058,
+    "temp_2_c": 0.02004330698793312
+  },
+  "temperature_noise_correlation": 0.0012160213450169253,
+  "temperature_difference_std_c": 0.025018155220546952,
+  "max_jaw_frequency_error_hz": 0.027168947576422964,
+  "quiet_gravity_norm_g": 1.0,
+  "ranges": {
+    "accel_x_g": {
+      "min": -0.3239083949557755,
+      "max": 0.18935597199949977
+    },
+    "accel_y_g": {
+      "min": -0.2780618458896745,
+      "max": 0.3420379461213775
+    },
+    "accel_z_g": {
+      "min": 0.8936733426759719,
+      "max": 1.0640922077700066
+    },
+    "light_norm": {
+      "min": 0.0186055903408303,
+      "max": 0.7676880328896879
+    },
+    "temp_1_c": {
+      "min": 33.87947946407209,
+      "max": 36.56291294092681
+    },
+    "temp_2_c": {
+      "min": 33.88298873003112,
+      "max": 36.58374674814798
+    }
+  },
+  "note": "Checks validate the synthetic data, not clinical or firmware performance.",
+  "csv_round_trip": "passed"
+}

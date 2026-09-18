@@ -1,0 +1,270 @@
+{
+  "synthetic": true,
+  "kind": "constant-value golden EEPROM images; not hardware measurements or sampled CSV data",
+  "window_seconds": {
+    "start": 0,
+    "end_exclusive": 250,
+    "phase": 0
+  },
+  "values": {
+    "old_temperature_c": 24,
+    "tmp119_temperature_c": -1,
+    "photodiode_raw": 1234,
+    "acceleration_g": [
+      -1,
+      0,
+      1
+    ],
+    "supply_v": 2.6
+  },
+  "defaults": {
+    "session_id": 1,
+    "acknowledged_id": 1,
+    "status_sequence": 1,
+    "state": "STOPPED",
+    "error": 0,
+    "mask": 15,
+    "oscillator": 0,
+    "startup_minutes": 0,
+    "multirate_epoch_seconds_since_2000": 100000,
+    "pending": "zero",
+    "pointer_generation": 0,
+    "unused_record_bytes": "FF"
+  },
+  "scheduler_pair_difference_offsets": [
+    19,
+    74,
+    75
+  ],
+  "files": [
+    {
+      "file": "synthetic-r1-2048.bin",
+      "revision": "R1",
+      "protocol_version": 3,
+      "storage": 1,
+      "timing": 0,
+      "file_bytes": 2048,
+      "log_start": 128,
+      "periods_seconds": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "record_counts": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "decoded_rows": 25,
+      "last_elapsed_seconds": 240,
+      "header_hex": "444e523103014000000880000f10000f000f000001000000010000000a0000000000000000000000000000000000000000000000000000000000000000004457",
+      "status_hex": "010000000f000100000001000000ddb5",
+      "sha256": "4e3a4395617ceea4347ab4bc453c9c4c6a76b776db8babf16e9ebcae8ac2b874",
+      "next_write_pointer": 528,
+      "first_record_hex": "0800ff80ffd20400c000000040000000"
+    },
+    {
+      "file": "synthetic-r2a-2048.bin",
+      "revision": "R2a",
+      "protocol_version": 5,
+      "storage": 2,
+      "timing": 1,
+      "file_bytes": 2048,
+      "log_start": 168,
+      "periods_seconds": [
+        120,
+        60,
+        30,
+        10
+      ],
+      "record_counts": [
+        3,
+        5,
+        9,
+        25
+      ],
+      "decoded_rows": 25,
+      "last_elapsed_seconds": 240,
+      "header_hex": "444e5232050240010008a8000f00000f000f000101000000a08601000a000c000c00060003000100a80000000000000000080000000000000c0000000000e508",
+      "status_hex": "010000000f000100000001000000ddb5",
+      "sha256": "691a72d05383ebb541c5b4c5288b227958c9e7838e1b4fa39578f558655d45ab",
+      "region_starts": [
+        168,
+        0,
+        0,
+        0
+      ],
+      "region_ends": [
+        2048,
+        0,
+        0,
+        0
+      ],
+      "next_write_pointers": [
+        488,
+        0,
+        0,
+        0
+      ],
+      "first_record_hex": [
+        "0f0800ff80ffd20400c000000040eb00",
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "file": "synthetic-r2b-2048.bin",
+      "revision": "R2b",
+      "protocol_version": 5,
+      "storage": 2,
+      "timing": 2,
+      "file_bytes": 2048,
+      "log_start": 168,
+      "periods_seconds": [
+        120,
+        60,
+        30,
+        10
+      ],
+      "record_counts": [
+        3,
+        5,
+        9,
+        25
+      ],
+      "decoded_rows": 25,
+      "last_elapsed_seconds": 240,
+      "header_hex": "444e5232050240020008a8000f00000f000f000101000000a08601000a000c000c00060003000100a80000000000000000080000000000000c0000000000ba67",
+      "status_hex": "010000000f000100000001000000ddb5",
+      "sha256": "af63a60752ff0f484ea68b0f7d1b536bec20fd570f26a0535b4de6bee72e3b66",
+      "region_starts": [
+        168,
+        0,
+        0,
+        0
+      ],
+      "region_ends": [
+        2048,
+        0,
+        0,
+        0
+      ],
+      "next_write_pointers": [
+        488,
+        0,
+        0,
+        0
+      ],
+      "first_record_hex": [
+        "0f0800ff80ffd20400c000000040eb00",
+        null,
+        null,
+        null
+      ]
+    },
+    {
+      "file": "synthetic-r3a-2048.bin",
+      "revision": "R3a",
+      "protocol_version": 5,
+      "storage": 1,
+      "timing": 1,
+      "file_bytes": 2048,
+      "log_start": 168,
+      "periods_seconds": [
+        120,
+        60,
+        30,
+        10
+      ],
+      "record_counts": [
+        3,
+        5,
+        9,
+        25
+      ],
+      "decoded_rows": 25,
+      "last_elapsed_seconds": 240,
+      "header_hex": "444e5232050140010008a8000f00000f000f000101000000a08601000a000c000c00060003000100a800e80064015802e8006401580200080c00000000005687",
+      "status_hex": "010000000f000100000001000000ddb5",
+      "sha256": "7f0241fa4338a345d068889787c014947aa5ffaffebcace38e9ffc4250143318",
+      "region_starts": [
+        168,
+        232,
+        356,
+        600
+      ],
+      "region_ends": [
+        232,
+        356,
+        600,
+        2048
+      ],
+      "next_write_pointers": [
+        180,
+        252,
+        392,
+        800
+      ],
+      "first_record_hex": [
+        "00ff08ef",
+        "80ff08e4",
+        "d2040895",
+        "00c00000004008f9"
+      ]
+    },
+    {
+      "file": "synthetic-r3b-2048.bin",
+      "revision": "R3b",
+      "protocol_version": 5,
+      "storage": 1,
+      "timing": 2,
+      "file_bytes": 2048,
+      "log_start": 168,
+      "periods_seconds": [
+        120,
+        60,
+        30,
+        10
+      ],
+      "record_counts": [
+        3,
+        5,
+        9,
+        25
+      ],
+      "decoded_rows": 25,
+      "last_elapsed_seconds": 240,
+      "header_hex": "444e5232050140020008a8000f00000f000f000101000000a08601000a000c000c00060003000100a800e80064015802e8006401580200080c000000000009e8",
+      "status_hex": "010000000f000100000001000000ddb5",
+      "sha256": "28240601a5f0a2ca4b993e076136b9eccda482563cd85e5e9c84c9cde0310d4c",
+      "region_starts": [
+        168,
+        232,
+        356,
+        600
+      ],
+      "region_ends": [
+        232,
+        356,
+        600,
+        2048
+      ],
+      "next_write_pointers": [
+        180,
+        252,
+        392,
+        800
+      ],
+      "first_record_hex": [
+        "00ff08ef",
+        "80ff08e4",
+        "d2040895",
+        "00c00000004008f9"
+      ]
+    }
+  ],
+  "format_reference": "../../multirate-protocol.md"
+}

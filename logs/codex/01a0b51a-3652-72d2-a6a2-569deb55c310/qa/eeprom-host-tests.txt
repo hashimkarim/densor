@@ -1,0 +1,52 @@
+✔ CRC vectors and all five canonical images match byte for byte (105.480209ms)
+✖ all 5 revisions × 15 sensor masks × 3 capacities decode against quantized real CSV samples (463.969624ms)
+✔ FSM/RTC pairs differ only at scheduler and header CRC bytes (2.092193ms)
+✔ capacity exact fits, empty ticks, and preflight of a whole mixed wake (103.565571ms)
+✔ invalid schedules, nonfinite/out-of-range values and missing due samples fail explicitly (4.539183ms)
+✔ rounding ties, signed extremes and disabled invalid columns do not wrap (95.35508ms)
+✔ Android rejects damaged metadata, committed records, pointer pairs and padding (71.780986ms)
+✔ real-source Android import candidates include sidecars and validate independently (113.204446ms)
+✔ firmware ZIP contains one full EEPROM image plus its synthetic JSON sidecar (42.07712ms)
+✔ real dataset matches its provenance and events remain separate (2.877182ms)
+✔ all three presets have independently calculated counts and aligned rows (1.658275ms)
+✔ off-grid rates, offsets and phases select the newest available row (3.762671ms)
+✔ end-exclusive boundaries and 100 Hz floating-point alignment are stable (14.693929ms)
+✔ disabled sensors are omitted, including invalid unused rate entries (0.245322ms)
+✔ invalid rates, windows and phases cannot produce an export (0.573391ms)
+✔ malformed source rows and mismatching metadata are rejected (0.338809ms)
+✔ preview binary matches a manually specified little-endian golden vector (0.414932ms)
+✔ Python independently unzips and decodes every multirate record (58.639371ms)
+✔ lab preview stays separate from the five firmware adapters (0.339961ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2182.138277
+
+✖ failing tests:
+
+test at NFC_harvester_battery_free/software/sampling_lab/tests/firmware-export.test.mjs:76:1
+✖ all 5 revisions × 15 sensor masks × 3 capacities decode against quantized real CSV samples (463.969624ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  'r2a' !== 'r2a-v5'
+  
+      at file:///home/hashim/Documents/phd/densor/NFC_harvester_battery_free/software/sampling_lab/tests/firmware-export.test.mjs:92:12
+      at Array.forEach (<anonymous>)
+      at TestContext.<anonymous> (file:///home/hashim/Documents/phd/densor/NFC_harvester_battery_free/software/sampling_lab/tests/firmware-export.test.mjs:88:9)
+      at Test.runInAsyncScope (node:async_hooks:226:14)
+      at Test.run (node:internal/test_runner/test:1201:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+      at Test.postRun (node:internal/test_runner/test:1330:19)
+      at Test.run (node:internal/test_runner/test:1258:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'r2a',
+    expected: 'r2a-v5',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
