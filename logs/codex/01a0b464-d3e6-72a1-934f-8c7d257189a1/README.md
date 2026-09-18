@@ -1,0 +1,3 @@
+# Summary
+
+This conversation was used to document the R1 firmware changes, including temperature-sensor selection, EEPROM alignment, data formats, build instructions and testing. It also updated the implementation handoff for one firmware codebase with separate storage and timing modules. The Android app was extended to detect and support R1, R2 (shared pool) and R3 (partitions), including both FSM and RTC timing variants for R2/R3 and import of synthetic EEPROM `.bin` dumps. The debug workflow was tested using Android Agent Lab and the Samsung S21 FE, including settings changes, read-back and dump import/export; physical sampling timing and NFC hardware behavior still require a Densor board.
